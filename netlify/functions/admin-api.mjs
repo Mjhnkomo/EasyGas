@@ -2,220 +2,40 @@
  * Easy Gas back office API (Netlify Function, single endpoint: POST /admin-api).
  *
  * Owner-only. Data lives in a private Netlify Blobs store ("easygas-admin"):
- *   auth                  password hash, session secret
- *   ledger                settings + restocks + daily sales + expenses (one JSON document)
- *   backup/YYYY-MM-DD     first copy of the ledger written each day (safety net)
- *   ratelimit/<hash>      failed-login counters
+ *   auth                password hash, session secret
+ *   ledger              settings + restocks + sales + expenses (one JSON document, versioned)
+ *   backup/YYYY-MM-DD   first copy of the ledger written each day (safety net)
+ *   ratelimit/<hash>    failed-login counters
  *
- * Money is integer cents, weights are integer hundredths of a kg ("ckg"), so 2.5 kg = 250.
- * Every entry stores the prices that applied when it was made; changing settings never
- * rewrites history.
+ * The calculations live in admin/calc.js and are shared with the owner page, so the totals the
+ * page shows instantly are the same totals the server works out.
  */
-import { createHash, createHmac, randomBytes, randomUUID, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
+import {
+  buildExpense,
+  buildRestock,
+  buildSale,
+  DEFAULT_SETTINGS,
+  EntryError,
+  EXPENSE_CATEGORIES,
+  PAYMENT_METHODS,
+  snapshotPrices,
+  summarise,
+  validateSettings,
+  withDefaults,
+} from "../../admin/calc.js";
+
+export { summarise } from "../../admin/calc.js";
 
 const scrypt = promisify(scryptCb);
-
-// ------------------------- Defaults (owner can change these in Settings) -------------------------
-
-export const DEFAULT_SETTINGS = {
-  sellCents: 190, // selling price per kg
-  baseBuyCents: 150, // buying price per kg (normal)
-  bulkBuyCents: 130, // buying price per kg (bulk)
-  bulkMinCkg: 25000, // bulk price applies to restocks of 250 kg or more
-  tankCkg: 5000, // one storage tank = 50 kg
-  openingStockCkg: 0, // gas already in stock before the first restock was recorded
-  openingStockCostCents: 150, // what that opening stock cost per kg
-};
-
-export const EXPENSE_CATEGORIES = ["Transport / fuel", "Delivery", "Wages", "Rent", "Equipment / repairs", "Airtime / data", "Other"];
-
-// ------------------------- Pure calculations (unit tested) -------------------------
-
-/** price (cents per kg) x weight (hundredths of kg) -> cents, rounded half-up */
-export function costFor(rateCents, ckg) {
-  return Math.floor((rateCents * ckg + 50) / 100);
-}
-
-export function parseKg(v) {
-  const s = String(v ?? "").trim().replace(",", ".");
-  if (!/^\d{1,5}(\.\d{1,2})?$/.test(s)) return null;
-  const [w, f = ""] = s.split(".");
-  const c = Number(w) * 100 + Number((f + "00").slice(0, 2));
-  return c > 0 ? c : null;
-}
-
-export function parseMoney(v) {
-  const s = String(v ?? "").trim().replace(",", ".").replace(/^\$/, "");
-  if (!/^\d{1,7}(\.\d{1,2})?$/.test(s)) return null;
-  const [w, f = ""] = s.split(".");
-  return Number(w) * 100 + Number((f + "00").slice(0, 2));
-}
-
-/** Which buying price applies to a restock of this size. */
-export function restockRate(ckg, settings) {
-  const bulk = ckg >= settings.bulkMinCkg;
-  return { bulk, rateCents: bulk ? settings.bulkBuyCents : settings.baseBuyCents };
-}
-
-const inRange = (d, from, to) => (!from || d >= from) && (!to || d <= to);
-
-/**
- * Summary for a period. Stock is valued at moving average cost, so "profit on gas sold" uses what
- * the gas that was actually sold cost, not whatever happened to be bought that week.
- */
-export function summarise(ledger, from, to) {
-  const s = ledger.settings;
-  // Chronological: restocks before sales on the same day, so a morning restock is available to sell.
-  const events = [
-    ...ledger.restocks.map((r) => ({ t: "r", date: r.date, order: 0, r })),
-    ...ledger.sales.map((x) => ({ t: "s", date: x.date, order: 1, x })),
-  ].sort((a, b) => (a.date === b.date ? a.order - b.order : a.date < b.date ? -1 : 1));
-
-  let stockCkg = s.openingStockCkg;
-  let stockValue = (s.openingStockCostCents * s.openingStockCkg) / 100; // cents, kept unrounded
-  let shortfallCkg = 0;
-
-  const p = { boughtCkg: 0, boughtPaidCents: 0, bulkSavingsCents: 0, restocks: 0, bulkRestocks: 0, soldCkg: 0, expectedCents: 0, receivedCents: 0, cogs: 0, salesDays: 0 };
-
-  for (const e of events) {
-    if (e.t === "r") {
-      stockCkg += e.r.ckg;
-      stockValue += e.r.paidCents;
-      if (inRange(e.date, from, to)) {
-        p.restocks++;
-        if (e.r.bulk) p.bulkRestocks++;
-        p.boughtCkg += e.r.ckg;
-        p.boughtPaidCents += e.r.paidCents;
-        p.bulkSavingsCents += Math.max(0, costFor(e.r.baseBuyCents, e.r.ckg) - costFor(e.r.rateCents, e.r.ckg));
-      }
-    } else {
-      const avg = stockCkg > 0 ? stockValue / stockCkg : 0; // cents per ckg
-      const fromStock = Math.min(e.x.ckg, Math.max(0, stockCkg));
-      const missing = e.x.ckg - fromStock;
-      // If more is sold than was recorded in stock, cost the gap at the normal buying price and warn.
-      const cogs = fromStock * avg + (missing * s.baseBuyCents) / 100;
-      stockValue -= fromStock * avg;
-      stockCkg -= fromStock;
-      if (missing > 0) shortfallCkg += missing;
-      if (inRange(e.date, from, to)) {
-        p.salesDays++;
-        p.soldCkg += e.x.ckg;
-        p.expectedCents += e.x.expectedCents;
-        p.receivedCents += e.x.receivedCents;
-        p.cogs += cogs;
-      }
-    }
-  }
-
-  const expenses = ledger.expenses.filter((x) => inRange(x.date, from, to));
-  const expensesCents = expenses.reduce((a, x) => a + x.amountCents, 0);
-  const byCategory = {};
-  for (const x of expenses) byCategory[x.category] = (byCategory[x.category] ?? 0) + x.amountCents;
-
-  const cogsCents = Math.round(p.cogs);
-  const grossProfitCents = p.receivedCents - cogsCents;
-  return {
-    from: from ?? null,
-    to: to ?? null,
-    gasBought: { kgCkg: p.boughtCkg, paidCents: p.boughtPaidCents, restocks: p.restocks, bulkRestocks: p.bulkRestocks, bulkSavingsCents: p.bulkSavingsCents },
-    sales: { kgCkg: p.soldCkg, expectedCents: p.expectedCents, receivedCents: p.receivedCents, differenceCents: p.receivedCents - p.expectedCents, days: p.salesDays },
-    expenses: { totalCents: expensesCents, byCategory },
-    profitOnGasSold: {
-      costOfGasSoldCents: cogsCents,
-      grossProfitCents,
-      netProfitCents: grossProfitCents - expensesCents,
-      profitPerKgCents: p.soldCkg > 0 ? Math.round(((grossProfitCents - expensesCents) * 100) / p.soldCkg) : null,
-    },
-    cash: { inCents: p.receivedCents, outGasCents: p.boughtPaidCents, outExpensesCents: expensesCents, netCents: p.receivedCents - p.boughtPaidCents - expensesCents },
-    stockNow: {
-      kgCkg: Math.max(0, stockCkg),
-      valueCents: Math.round(Math.max(0, stockValue)),
-      avgCostCents: stockCkg > 0 ? Math.round((stockValue / stockCkg) * 100) : null,
-      tanks: s.tankCkg > 0 ? Math.round((Math.max(0, stockCkg) / s.tankCkg) * 10) / 10 : null,
-      shortfallCkg,
-    },
-  };
-}
-
-// ------------------------- Validation -------------------------
+const KINDS = { sale: "sales", restock: "restocks", expense: "expenses" };
+const BUILDERS = { sale: buildSale, restock: buildRestock, expense: buildExpense };
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 class UserError extends Error {}
-const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-function vDate(v) {
-  if (!DATE.test(String(v)) || Number.isNaN(Date.parse(v))) throw new UserError("Choose a valid date.");
-  return String(v);
-}
-function vNote(v) {
-  return String(v ?? "").trim().slice(0, 300);
-}
-
-export function buildRestock(input, settings) {
-  const date = vDate(input.date);
-  let ckg = parseKg(input.kg);
-  if (!ckg && input.tanks) {
-    const tanks = Number(input.tanks);
-    if (!Number.isInteger(tanks) || tanks < 1 || tanks > 100) throw new UserError("Enter the number of tanks filled (1 to 100).");
-    ckg = tanks * settings.tankCkg;
-  }
-  if (!ckg || ckg > 10_000_000) throw new UserError("Enter how many kg were bought.");
-  const { bulk, rateCents } = restockRate(ckg, settings);
-  const calcCents = costFor(rateCents, ckg);
-  let paidCents = calcCents;
-  if (input.paid !== undefined && String(input.paid).trim() !== "") {
-    const pc = parseMoney(input.paid);
-    if (pc === null) throw new UserError("Enter the amount paid, e.g. 325.00, or leave it blank.");
-    paidCents = pc;
-  }
-  return { id: randomUUID(), date, ckg, bulk, rateCents, baseBuyCents: settings.baseBuyCents, calcCents, paidCents, note: vNote(input.note), createdAt: new Date().toISOString() };
-}
-
-export function buildSale(input, settings) {
-  const date = vDate(input.date);
-  const ckg = parseKg(input.kg);
-  if (!ckg) throw new UserError("Enter how many kg were sold.");
-  const receivedCents = parseMoney(input.received);
-  if (receivedCents === null) throw new UserError("Enter the money actually received, e.g. 171.00.");
-  return { id: randomUUID(), date, ckg, sellCents: settings.sellCents, expectedCents: costFor(settings.sellCents, ckg), receivedCents, note: vNote(input.note), createdAt: new Date().toISOString() };
-}
-
-export function buildExpense(input) {
-  const date = vDate(input.date);
-  const category = EXPENSE_CATEGORIES.includes(input.category) ? input.category : null;
-  if (!category) throw new UserError("Choose an expense category.");
-  const amountCents = parseMoney(input.amount);
-  if (!amountCents) throw new UserError("Enter the expense amount.");
-  return { id: randomUUID(), date, category, amountCents, note: vNote(input.note), createdAt: new Date().toISOString() };
-}
-
-export function validateSettings(input) {
-  const money = (k, label) => {
-    const v = parseMoney(input[k]);
-    if (v === null || v <= 0 || v > 100000) throw new UserError(`Enter a valid ${label}.`);
-    return v;
-  };
-  const kg = (k, label, allowZero = false) => {
-    const s = String(input[k] ?? "").trim();
-    if (allowZero && (s === "" || s === "0")) return 0;
-    const v = parseKg(s);
-    if (!v) throw new UserError(`Enter a valid ${label} in kg.`);
-    return v;
-  };
-  const out = {
-    sellCents: money("sell", "selling price"),
-    baseBuyCents: money("baseBuy", "normal buying price"),
-    bulkBuyCents: money("bulkBuy", "bulk buying price"),
-    bulkMinCkg: kg("bulkMinKg", "bulk threshold"),
-    tankCkg: kg("tankKg", "tank size"),
-    openingStockCkg: kg("openingStockKg", "opening stock", true),
-    openingStockCostCents: money("openingStockCost", "opening stock cost"),
-  };
-  if (out.bulkBuyCents > out.baseBuyCents) throw new UserError("The bulk price should not be higher than the normal buying price.");
-  return out;
-}
-
-// ------------------------- Auth helpers -------------------------
+// ---------------------------------------------------------------- auth helpers
 
 async function hashPassword(pw) {
   const salt = randomBytes(16);
@@ -253,15 +73,34 @@ function readCookie(req, name) {
 function cookieHeader(value, maxAge) {
   return `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`;
 }
+function sessionCookie(auth) {
+  return cookieHeader(sign(auth.sessionSecret, { exp: Date.now() + SESSION_DAYS * 86400_000, v: auth.version }), SESSION_DAYS * 86400);
+}
 
-// ------------------------- Handler -------------------------
+// ---------------------------------------------------------------- helpers
 
 function json(status, body, extraHeaders = {}) {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store", "x-robots-tag": "noindex", ...extraHeaders } });
 }
-
 function emptyLedger() {
-  return { settings: { ...DEFAULT_SETTINGS }, settingsHistory: [], restocks: [], sales: [], expenses: [] };
+  return { rev: 0, settings: { ...DEFAULT_SETTINGS }, settingsHistory: [], restocks: [], sales: [], expenses: [] };
+}
+function kindOf(k) {
+  const list = KINDS[k];
+  if (!list) throw new UserError("Unknown entry type.");
+  return list;
+}
+function publicLedger(l) {
+  return {
+    rev: l.rev ?? 0,
+    settings: withDefaults(l.settings),
+    settingsHistory: (l.settingsHistory ?? []).slice(-20),
+    restocks: l.restocks,
+    sales: l.sales,
+    expenses: l.expenses,
+    categories: EXPENSE_CATEGORIES,
+    methods: PAYMENT_METHODS,
+  };
 }
 
 /**
@@ -285,13 +124,11 @@ export function createHandler(getStoreFn, env = process.env) {
 
     try {
       let auth = await store.get("auth", { type: "json" });
+      const session = auth ? unsign(auth.sessionSecret, readCookie(req, COOKIE)) : null;
+      const signedIn = !!(session && session.exp > Date.now() && session.v === auth.version);
 
-      // -- First-time setup: requires the setup code the owner put in Netlify's environment variables.
-      if (action === "status") {
-        const session = auth ? unsign(auth.sessionSecret, readCookie(req, COOKIE)) : null;
-        const ok = !!(session && session.exp > Date.now() && session.v === auth.version);
-        return json(200, { setUp: !!auth, signedIn: ok, setupAvailable: !auth && !!env.EASYGAS_SETUP_CODE });
-      }
+      // ---------- sign-in actions
+      if (action === "status") return json(200, { setUp: !!auth, signedIn, setupAvailable: !auth && !!env.EASYGAS_SETUP_CODE });
       if (action === "setup") {
         if (auth) return json(409, { error: "Already set up. Log in instead." });
         const code = env.EASYGAS_SETUP_CODE;
@@ -303,8 +140,7 @@ export function createHandler(getStoreFn, env = process.env) {
         auth = { passwordHash: await hashPassword(pw), sessionSecret: randomBytes(32).toString("base64url"), version: 1, createdAt: new Date().toISOString() };
         const created = await store.setJSON("auth", auth, { onlyIfNew: true });
         if (created && created.modified === false) return json(409, { error: "Already set up. Log in instead." });
-        const token = sign(auth.sessionSecret, { exp: Date.now() + SESSION_DAYS * 86400_000, v: auth.version });
-        return json(200, { ok: true }, { "set-cookie": cookieHeader(token, SESSION_DAYS * 86400) });
+        return json(200, { ok: true }, { "set-cookie": sessionCookie(auth) });
       }
       if (action === "login") {
         if (!auth) return json(409, { error: "Not set up yet." });
@@ -319,94 +155,135 @@ export function createHandler(getStoreFn, env = process.env) {
           return json(401, { error: "That password is not correct." });
         }
         await store.delete(rlKey);
-        const token = sign(auth.sessionSecret, { exp: Date.now() + SESSION_DAYS * 86400_000, v: auth.version });
-        return json(200, { ok: true }, { "set-cookie": cookieHeader(token, SESSION_DAYS * 86400) });
+        return json(200, { ok: true }, { "set-cookie": sessionCookie(auth) });
       }
       if (action === "logout") return json(200, { ok: true }, { "set-cookie": cookieHeader("", 0) });
 
-      // -- Everything below needs a valid session.
-      const session = auth ? unsign(auth.sessionSecret, readCookie(req, COOKIE)) : null;
-      if (!session || session.exp < Date.now() || session.v !== auth.version) return json(401, { error: "Please log in again.", signedOut: true });
+      // ---------- everything below needs a valid session
+      if (!signedIn) return json(401, { error: "Please log in again.", signedOut: true });
 
-      // Load the ledger with its version tag so two saves can't overwrite each other.
-      const loaded = await store.getWithMetadata("ledger", { type: "json" });
-      const ledger = loaded?.data ?? emptyLedger();
-      const etag = loaded?.etag;
+      const read = async () => {
+        const loaded = await store.getWithMetadata("ledger", { type: "json" });
+        return { ledger: loaded?.data ?? emptyLedger(), etag: loaded?.etag, original: loaded?.data ?? null };
+      };
 
-      const save = async () => {
-        const today = new Date().toISOString().slice(0, 10);
-        if (loaded && !(await store.get(`backup/${today}`, { type: "json" }))) await store.setJSON(`backup/${today}`, loaded.data);
-        const res = await store.setJSON("ledger", ledger, etag ? { onlyIfMatch: etag } : { onlyIfNew: true });
-        if (res && res.modified === false) throw new UserError("Someone else saved at the same moment. Please try again.");
+      /**
+       * Apply a change and save it. If another phone saved in between, re-read and apply again
+       * (every change here is safe to re-apply), so the owner never sees a "try again" error.
+       */
+      const NO_CHANGE = Symbol("no change");
+      const mutate = async (fn) => {
+        for (let attempt = 0; attempt < 4; attempt++) {
+          const { ledger, etag, original } = await read();
+          const result = fn(ledger, NO_CHANGE);
+          if (Array.isArray(result) && result[0] === NO_CHANGE) return { result: result[1], rev: ledger.rev ?? 0 };
+          ledger.rev = (ledger.rev ?? 0) + 1;
+          const today = new Date().toISOString().slice(0, 10);
+          if (original && !(await store.get(`backup/${today}`, { type: "json" }))) await store.setJSON(`backup/${today}`, original);
+          const res = await store.setJSON("ledger", ledger, etag ? { onlyIfMatch: etag } : { onlyIfNew: true });
+          if (!res || res.modified !== false) return { result, rev: ledger.rev };
+        }
+        throw new UserError("Couldn't save because the data kept changing. Please try again.");
       };
 
       switch (action) {
         case "load": {
-          const { from, to } = body;
-          return json(200, { settings: ledger.settings, settingsHistory: ledger.settingsHistory.slice(-20), restocks: ledger.restocks, sales: ledger.sales, expenses: ledger.expenses, categories: EXPENSE_CATEGORIES, summary: summarise(ledger, from || null, to || null) });
+          const { ledger } = await read();
+          return json(200, publicLedger(ledger));
         }
-        case "summary":
+        case "rev": {
+          // Cheap check used by other devices to see if anything changed.
+          const { ledger } = await read();
+          return json(200, { rev: ledger.rev ?? 0 });
+        }
+        case "summary": {
+          const { ledger } = await read();
           return json(200, { summary: summarise(ledger, body.from || null, body.to || null) });
-        case "addRestock": {
-          const r = buildRestock(body, ledger.settings);
-          ledger.restocks.push(r);
-          await save();
-          return json(200, { ok: true, entry: r });
         }
-        case "addSale": {
-          const x = buildSale(body, ledger.settings);
-          if (ledger.sales.some((s) => s.date === x.date) && !body.allowSecond) return json(409, { error: "Sales for this date are already recorded. Delete that entry first, or confirm to add a second one.", duplicateDate: true });
-          ledger.sales.push(x);
-          await save();
-          return json(200, { ok: true, entry: x });
+        case "add": {
+          const list = kindOf(body.kind);
+          const id = UUID.test(String(body.id)) ? String(body.id) : crypto.randomUUID();
+          const { result, rev } = await mutate((ledger, NO) => {
+            const existing = ledger[list].find((e) => e.id === id);
+            if (existing) return [NO, existing]; // same entry sent twice (double tap / retry): keep one
+            const entry = { id, ...BUILDERS[body.kind](body.entry ?? {}, withDefaults(ledger.settings)), createdAt: new Date().toISOString() };
+            ledger[list].push(entry);
+            return entry;
+          });
+          return json(200, { ok: true, entry: result, rev });
         }
-        case "addExpense": {
-          const x = buildExpense(body);
-          ledger.expenses.push(x);
-          await save();
-          return json(200, { ok: true, entry: x });
+        case "update": {
+          const list = kindOf(body.kind);
+          const { result, rev } = await mutate((ledger) => {
+            const i = ledger[list].findIndex((e) => e.id === body.id);
+            if (i < 0) throw new UserError("That entry no longer exists. It may have been deleted on another device.");
+            const old = ledger[list][i];
+            const rebuilt = BUILDERS[body.kind](body.entry ?? {}, snapshotPrices(body.kind, old, ledger.settings));
+            ledger[list][i] = { ...rebuilt, id: old.id, createdAt: old.createdAt, updatedAt: new Date().toISOString() };
+            return ledger[list][i];
+          });
+          return json(200, { ok: true, entry: result, rev });
         }
         case "delete": {
-          const kind = { restock: "restocks", sale: "sales", expense: "expenses" }[body.kind];
-          if (!kind) throw new UserError("Unknown entry type.");
-          const before = ledger[kind].length;
-          ledger[kind] = ledger[kind].filter((e) => e.id !== body.id);
-          if (ledger[kind].length === before) throw new UserError("That entry no longer exists.");
-          await save();
-          return json(200, { ok: true });
+          const list = kindOf(body.kind);
+          const { result, rev } = await mutate((ledger, NO) => {
+            const entry = ledger[list].find((e) => e.id === body.id);
+            if (!entry) return [NO, null]; // already gone
+            ledger[list] = ledger[list].filter((e) => e.id !== body.id);
+            return entry;
+          });
+          return json(200, { ok: true, deleted: result, rev });
+        }
+        case "restore": {
+          // Undo a delete: put the exact entry back (validated, prices as originally stored).
+          const list = kindOf(body.kind);
+          const e = body.entry ?? {};
+          if (!UUID.test(String(e.id))) throw new UserError("Can't restore that entry.");
+          const { rev } = await mutate((ledger, NO) => {
+            if (ledger[list].some((x) => x.id === e.id)) return [NO, null];
+            const prices = snapshotPrices(body.kind, e, ledger.settings);
+            const input =
+              body.kind === "sale"
+                ? { ...e, kg: e.ckg / 100, received: e.receivedCents / 100 }
+                : body.kind === "restock"
+                  ? { ...e, kg: e.ckg / 100, paid: e.paidCents / 100 }
+                  : { ...e, amount: e.amountCents / 100 };
+            ledger[list].push({ ...BUILDERS[body.kind](input, prices), id: e.id, createdAt: e.createdAt ?? new Date().toISOString() });
+          });
+          return json(200, { ok: true, rev });
         }
         case "updateSettings": {
           // Locked: needs the password again, plus an explicit confirmation from the page.
           if (body.confirm !== "CHANGE") throw new UserError("Type CHANGE to confirm.");
           if (!(await verifyPassword(body.password ?? "", auth.passwordHash))) return json(401, { error: "That password is not correct. Settings were not changed." });
           const next = validateSettings(body.settings ?? {});
-          ledger.settingsHistory.push({ at: new Date().toISOString(), before: ledger.settings, after: next });
-          ledger.settings = next;
-          await save();
-          return json(200, { ok: true, settings: next });
+          const { rev } = await mutate((ledger) => {
+            ledger.settingsHistory = ledger.settingsHistory ?? [];
+            ledger.settingsHistory.push({ at: new Date().toISOString(), before: withDefaults(ledger.settings), after: next });
+            ledger.settings = next;
+          });
+          return json(200, { ok: true, settings: next, rev });
         }
         case "changePassword": {
           if (!(await verifyPassword(body.current ?? "", auth.passwordHash))) return json(401, { error: "Current password is not correct." });
           const pw = String(body.next ?? "");
           if (pw.length < 10) throw new UserError("Choose a new password of at least 10 characters.");
-          // New version signs every other device out.
           auth = { ...auth, passwordHash: await hashPassword(pw), version: auth.version + 1 };
           await store.setJSON("auth", auth);
-          const token = sign(auth.sessionSecret, { exp: Date.now() + SESSION_DAYS * 86400_000, v: auth.version });
-          return json(200, { ok: true }, { "set-cookie": cookieHeader(token, SESSION_DAYS * 86400) });
+          return json(200, { ok: true }, { "set-cookie": sessionCookie(auth) });
         }
         default:
           return json(400, { error: "Unknown action." });
       }
     } catch (e) {
-      if (e instanceof UserError) return json(400, { error: e.message });
+      if (e instanceof UserError || e instanceof EntryError) return json(400, { error: e.message });
       console.error("admin-api error", e instanceof Error ? e.message : e);
       return json(500, { error: "Something went wrong. Please try again." });
     }
   };
 }
 
-// ------------------------- Netlify entry point -------------------------
+// ---------------------------------------------------------------- Netlify entry point
 
 export default async (req, context) => {
   const { getStore } = await import("@netlify/blobs");

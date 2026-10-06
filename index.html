@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"LocalBusiness","name":"Easy Gas","url":"https://easygas-bulawayo.netlify.app/","logo":"https://easygas-bulawayo.netlify.app/easy-gas-logo.png","telephone":"+263789184693","paymentAccepted":"EcoCash, Cash","address":{"@type":"PostalAddress","streetAddress":"8182 Gwabalanda, Luveve","addressLocality":"Bulawayo","addressCountry":"ZW"},"areaServed":[{"@type":"Place","name":"Entumbane"},{"@type":"Place","name":"Gwabalanda"},{"@type":"Place","name":"Mpopoma"},{"@type":"Place","name":"Luveve Road"}],"makesOffer":{"@type":"Offer","itemOffered":{"@type":"Service","name":"LPG cylinder refill"},"priceSpecification":{"@type":"UnitPriceSpecification","price":"1.90","priceCurrency":"USD","unitCode":"KGM"}}}
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Easy Gas","url":"https://easygas-bulawayo.netlify.app/","logo":"https://easygas-bulawayo.netlify.app/easy-gas-logo.png","telephone":"+263789184693","paymentAccepted":"EcoCash, Cash","openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"06:00","closes":"22:00"},"address":{"@type":"PostalAddress","streetAddress":"8182 Gwabalanda, Luveve","addressLocality":"Bulawayo","addressCountry":"ZW"},"areaServed":[{"@type":"Place","name":"Entumbane"},{"@type":"Place","name":"Gwabalanda"},{"@type":"Place","name":"Mpopoma"},{"@type":"Place","name":"Luveve Road"}],"makesOffer":{"@type":"Offer","itemOffered":{"@type":"Service","name":"LPG cylinder refill"},"priceSpecification":{"@type":"UnitPriceSpecification","price":"1.90","priceCurrency":"USD","unitCode":"KGM"}}}
 </script>
 <style>
   :root {
@@ -35,6 +35,7 @@
     --bar: 0px;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
   body { margin: 0; font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--ink); background: #fff; line-height: 1.55; padding-bottom: calc(var(--bar) + env(safe-area-inset-bottom)); }
   img { max-width: 100%; display: block; }
@@ -60,6 +61,12 @@
   .btn-call:hover { background: #24323d; }
   .head-actions { display: flex; gap: 8px; align-items: center; }
   .btn svg { width: 22px; height: 22px; flex: none; }
+  .perks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .perk { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: 14px; font-weight: 700; }
+  .perk.free { background: #eaf6ee; border-color: #bfe3cb; color: var(--wa-dark); }
+  .small-note { background: #fff8e8; border: 1px solid #f3d58b; border-radius: 14px; padding: 14px 16px; margin-top: 14px; font-size: 15px; }
+  .small-note .ctas { margin-top: 12px; gap: 8px; }
+  .small-note .btn { min-height: 44px; font-size: 15px; padding: 0 16px; }
 
   /* Header */
   header { position: sticky; top: 0; z-index: 40; background: rgb(255 255 255 / .92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
@@ -236,9 +243,13 @@
       <div>
         <p class="eyebrow rise">LPG cylinder refills &#xb7; Bulawayo</p>
         <h1 class="rise d1">Keep Your Home Cooking.</h1>
-        <p class="lede rise d2">Great-value LPG cylinder refills with local delivery around Entumbane, Gwabalanda, Mpopoma and Luveve Road.</p>
+        <p class="lede rise d2">Great-value LPG cylinder refills in Bulawayo. <strong>Free delivery on 9 kg or more</strong> around Entumbane, Gwabalanda, Mpopoma and Luveve Road, or collect any amount from us.</p>
         <div class="price-tag rise d2">
           <div><small>Refill price</small><strong class="num" data-price>$1.90</strong> <span data-unit>/ kg</span></div>
+        </div>
+        <div class="perks rise d2">
+          <span class="perk free">Free delivery from 9 kg</span>
+          <span class="perk">Open 6am&#x2013;10pm, every day</span>
         </div>
         <div class="ctas rise d2">
           <a class="btn btn-wa" data-wa="greeting" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Order on WhatsApp</a>
@@ -250,8 +261,8 @@
         <img class="big-logo" src="easy-gas-logo.png" alt="" width="600" height="221">
         <div class="facts">
           <div><b class="num" data-price>$1.90</b>per kg</div>
-          <div><b>Local</b>delivery</div>
-          <div><b>EcoCash</b>or cash</div>
+          <div><b>Free</b>delivery from 9 kg</div>
+          <div><b>6am&#x2013;10pm</b>every day</div>
         </div>
       </div>
     </div>
@@ -269,7 +280,7 @@
           </div>
           <ul>
             <li><span class="tick">&#x2713;</span><span>You pay for the weight of gas you ask for, not the size of the cylinder.</span></li>
-            <li><span class="tick">&#x2713;</span><span>Delivery fees depend on your area. We confirm the fee with you before delivery.</span></li>
+            <li><span class="tick">&#x2713;</span><span><strong>Free delivery</strong> on refills of 9 kg or more in our delivery areas. Smaller refills are always welcome for collection.</span></li>
             <li><span class="tick">&#x2713;</span><span>We confirm the final weight and total on WhatsApp before you pay.</span></li>
             <li><span class="tick">&#x2713;</span><span>Pay with <strong>EcoCash</strong> or <strong>cash</strong>. We agree the details with you on WhatsApp.</span></li>
           </ul>
@@ -291,8 +302,15 @@
           <fieldset>
             <legend>2. Delivery or collection?</legend>
             <div class="seg" role="radiogroup" aria-label="Delivery or collection">
-              <button type="button" role="radio" aria-checked="true" data-mode="delivery">Delivery</button>
+              <button type="button" role="radio" aria-checked="true" data-mode="delivery">Delivery (9 kg+)</button>
               <button type="button" role="radio" aria-checked="false" data-mode="collection">I'll collect</button>
+            </div>
+            <div class="small-note" id="small-note" hidden role="status">
+              <p><strong>Delivery is free on refills of 9 kg or more.</strong> For <span id="small-kg">this amount</span>, please collect from us at 8182 Gwabalanda, Luveve. We're open 6am&#x2013;10pm, every day.</p>
+              <div class="ctas">
+                <button type="button" class="btn btn-ghost" id="to-collect">Collect instead</button>
+                <button type="button" class="btn btn-wa" id="to-nine">Make it 9 kg with free delivery</button>
+              </div>
             </div>
             <div class="field" id="area-field" style="margin-top:16px">
               <label for="area">Your area</label>
@@ -307,7 +325,7 @@
               <input type="text" id="other" aria-describedby="other-err">
               <p class="err" id="other-err" role="alert"></p>
             </div>
-            <p class="hint" id="collect-note" hidden style="margin-top:12px">Collect from <strong>8182 Gwabalanda, Luveve</strong>. We'll confirm a time on WhatsApp.</p>
+            <p class="hint" id="collect-note" hidden style="margin-top:12px">Collect any amount from <strong>8182 Gwabalanda, Luveve</strong>, 6am&#x2013;10pm every day. Message us and we'll have it ready.</p>
           </fieldset>
 
           <div class="estimate" aria-live="polite">
@@ -361,7 +379,7 @@
         <div class="section-title">
           <p class="eyebrow">Delivery areas</p>
           <h2>Where we deliver</h2>
-          <p>We deliver to the areas below. We don't cover all of Bulawayo, so message us to confirm coverage, the delivery fee and availability for your address.</p>
+          <p><strong>Free delivery on refills of 9 kg or more</strong> to the areas below. We don't cover all of Bulawayo, so if you're nearby, ask us first. Need less than 9 kg? Collect from us any day, 6am&#x2013;10pm.</p>
         </div>
         <ul class="area-list" id="area-list"></ul>
       </div>
@@ -400,9 +418,10 @@
     <div class="wrap">
       <div class="card pickup-card">
         <div>
-          <p class="eyebrow">Prefer to collect?</p>
+          <p class="eyebrow">Collect any amount</p>
           <p class="addr">8182 Gwabalanda, Luveve, Bulawayo</p>
-          <p style="color:var(--muted);margin-top:6px">Bring your cylinder to us. Message us first so we can have your refill ready.</p>
+          <p style="font-weight:700;margin-top:6px">Open 6am&#x2013;10pm, Monday to Sunday</p>
+          <p style="color:var(--muted);margin-top:6px">Bring your cylinder, big or small. Message us first so we can have your refill ready.</p>
         </div>
         <div class="ctas" style="margin-top:0">
           <a class="btn btn-wa" data-wa="collect" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Arrange collection</a>
@@ -423,8 +442,9 @@
       <details><summary>How much does a refill cost?</summary><p><span data-price>$1.90</span> per kg. For example, 9 kg of gas costs <span data-example>$17.10</span>, plus any delivery fee.</p></details>
       <details><summary>How much gas can I order?</summary><p>Tell us how many kilograms you need. Never ask for more than your cylinder is permitted to hold. We confirm the final weight we supply.</p></details>
       <details><summary>Where do you deliver?</summary><p>Entumbane, Gwabalanda, Mpopoma and areas along Luveve Road. If you're nearby, ask us on WhatsApp and we'll confirm whether we can reach you.</p></details>
-      <details><summary>How much is delivery?</summary><p>The delivery fee depends on where you are. We confirm it with you on WhatsApp before we deliver.</p></details>
-      <details><summary>Can I collect instead?</summary><p>Yes. Collect from 8182 Gwabalanda, Luveve. Message us first so your refill is ready.</p></details>
+      <details><summary>Is delivery free?</summary><p>Yes, on refills of 9 kg or more to Entumbane, Gwabalanda, Mpopoma and areas along Luveve Road. For refills under 9 kg, please collect from us; any amount is welcome. If you live nearby but outside these areas, ask us on WhatsApp.</p></details>
+      <details><summary>Can I collect instead?</summary><p>Yes, any amount. Collect from 8182 Gwabalanda, Luveve, 6am&#x2013;10pm, Monday to Sunday. Message us first so your refill is ready.</p></details>
+      <details><summary>When are you open?</summary><p>Every day, Monday to Sunday, from 6am to 10pm.</p></details>
       <details><summary>How do I pay?</summary><p>We accept EcoCash and cash. Once we've confirmed your order and total on WhatsApp, we'll tell you how to pay. Nothing is paid on this website, and we never ask for your EcoCash PIN.</p></details>
       <details><summary>What can I use LPG for?</summary><p>LPG is a practical fuel for household cooking and heating when used with appliances designed for it.</p></details>
     </div>
@@ -447,6 +467,7 @@
 <footer>
   <div class="wrap">
     <p>&#xa9; <span id="year">2026</span> Easy Gas &#xb7; 8182 Gwabalanda, Luveve, Bulawayo &#xb7; WhatsApp or call <a href="tel:+263789184693" data-call class="num">+263 78 918 4693</a></p>
+    <p>Open 6am&#x2013;10pm, Monday to Sunday. Free delivery on refills of 9 kg or more.</p>
     <p>Use LPG only with appliances designed for it, and keep cylinders upright in a well-ventilated place.</p>
   </div>
 </footer>
@@ -464,7 +485,8 @@ const CONFIG = {
   unit: "kg",
   areas: ["Entumbane", "Gwabalanda", "Mpopoma", "Areas along Luveve Road"],
   // Delivery fee per area in cents. Leave null when not decided: the page then says "confirmed on WhatsApp", never "free".
-  deliveryFees: { "Entumbane": null, "Gwabalanda": null, "Mpopoma": null, "Areas along Luveve Road": null },
+  deliveryFees: { "Entumbane": 0, "Gwabalanda": 0, "Mpopoma": 0, "Areas along Luveve Road": 0 },
+  freeDeliveryMinKg: 9,                 // delivery is free from this weight up; smaller refills are collection only
   pickupAddress: "8182 Gwabalanda, Luveve",
 };
 /* \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
@@ -508,6 +530,9 @@ const CONFIG = {
     input.setAttribute("aria-invalid", msg ? "true" : "false");
   }
 
+  const minCkg = CONFIG.freeDeliveryMinKg * 100;
+  const tooSmall = () => { const c = parseKg(kg.value); return mode === "delivery" && c !== null && c < minCkg; };
+
   function feeFor() {
     if (mode !== "delivery") return { kind: "na" };
     if (!area.value || area.value === "other") return { kind: "tbc" };
@@ -521,10 +546,15 @@ const CONFIG = {
     $("#gas-label").textContent = c ? `Gas \u00b7 ${fmtKg(c)} \u00d7 ${money(CONFIG.priceCents)}/${CONFIG.unit}` : "Gas";
     $("#gas-out").textContent = c ? money(subtotal(c)) : "\u2014";
     $("#del-row").hidden = mode !== "delivery";
-    $("#del-out").textContent = fee.kind === "known" ? (fee.cents === 0 ? "No delivery charge" : money(fee.cents)) : "Confirmed on WhatsApp";
+    $("#del-out").textContent = fee.kind === "known" ? (fee.cents === 0 ? "Free" : money(fee.cents)) : "Confirmed on WhatsApp";
     $("#total-out").textContent = !c ? "\u2014" : fee.kind === "tbc" ? money(subtotal(c)) + " + delivery" : money(subtotal(c) + (fee.cents || 0));
-    $("#area-field").hidden = $("#addr-field").hidden = mode !== "delivery";
-    $("#other-field").hidden = !(mode === "delivery" && area.value === "other");
+    const small = tooSmall();
+    $("#small-note").hidden = !small;
+    if (small) $("#small-kg").textContent = fmtKg(c);
+    $("#area-field").hidden = $("#addr-field").hidden = mode !== "delivery" || small;
+    $("#del-row").hidden = mode !== "delivery" || small;
+    if (small) $("#total-out").textContent = money(subtotal(c)) + " (collection)";
+    $("#other-field").hidden = !(mode === "delivery" && !small && area.value === "other");
     $("#collect-note").hidden = mode !== "collection";
   }
 
@@ -548,13 +578,21 @@ const CONFIG = {
     el.addEventListener("input", () => { setErr(el, id, ""); update(); }),
   );
   area.addEventListener("change", update);
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll("[data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x.dataset.mode === m)));
+    update();
+  }
+  $("#to-collect").addEventListener("click", () => setMode("collection"));
+  $("#to-nine").addEventListener("click", () => { kg.value = String(CONFIG.freeDeliveryMinKg); setErr(kg, "#kg-err", ""); update(); });
 
   $("#order-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const c = parseKg(kg.value);
     const errs = [];
     if (!c) errs.push([kg, "#kg-err", "Enter the weight in kg, e.g. 9 or 4.5."]);
-    if (mode === "delivery") {
+    if (c && mode === "delivery" && c < minCkg) errs.push([kg, "#kg-err", `Delivery is free from ${CONFIG.freeDeliveryMinKg} kg. Choose \u201cI'll collect\u201d or make it ${CONFIG.freeDeliveryMinKg} kg.`]);
+    if (mode === "delivery" && !(c && c < minCkg)) {
       if (!area.value) errs.push([area, "#area-err", "Choose your area."]);
       if (area.value === "other" && other.value.trim().length < 2) errs.push([other, "#other-err", "Tell us your suburb."]);
       if (addr.value.trim().length < 5) errs.push([addr, "#addr-err", "Enter the delivery address."]);
@@ -572,7 +610,7 @@ const CONFIG = {
       mode === "delivery" ? `Delivery to: ${where}` : `Collection from ${CONFIG.pickupAddress}`,
       mode === "delivery" ? `Address: ${addr.value.trim()}` : null,
       `Gas estimate: ${money(subtotal(c))} (${fmtKg(c)} \u00d7 ${money(CONFIG.priceCents)}/${CONFIG.unit})`,
-      mode === "delivery" ? (fee.kind === "known" ? `Delivery fee: ${fee.cents === 0 ? "no charge" : money(fee.cents)}` : "Delivery fee: please confirm") : null,
+      mode === "delivery" ? (fee.kind === "known" ? `Delivery: ${fee.cents === 0 ? "free (9 kg or more)" : money(fee.cents)}` : "Delivery fee: please confirm (outside listed areas)") : null,
       `Payment: ${pay}`,
       notes.value.trim() ? `Notes: ${notes.value.trim()}` : null,
       "Please confirm availability and the total. Thank you.",

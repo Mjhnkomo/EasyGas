@@ -176,7 +176,7 @@ export function buildSale(input, prices) {
     receivedCents = parseMoney(input.received);
     if (receivedCents === null) throw new EntryError("Enter the money received, e.g. 17.10.");
   }
-  const method = PAYMENT_METHODS.includes(input.method) ? input.method : "Cash";
+  const method = PAYMENT_METHODS.includes(input.method) ? input.method : null; // null = not recorded
   return { date: vDate(input.date), time: vTime(input.time), ckg, sellCents: s.sellCents, expectedCents, receivedCents, method, note: vNote(input.note) };
 }
 

@@ -1,1 +1,633 @@
-ElevenLabs API key
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Easy Gas | LPG gas refills in Bulawayo &#x2013; order on WhatsApp</title>
+<meta name="description" content="Great-value LPG cylinder refills at $1.90 per kg, with local delivery around Entumbane, Gwabalanda, Mpopoma and Luveve Road, Bulawayo. Order on WhatsApp.">
+<meta name="theme-color" content="#162027">
+<meta property="og:title" content="Easy Gas | LPG gas refills in Bulawayo">
+<meta property="og:description" content="LPG refills at $1.90 per kg with local delivery. Order on WhatsApp or call +263 78 918 4693.">
+<meta property="og:image" content="https://easygas-bulawayo.netlify.app/easy-gas-logo.png">
+<meta property="og:url" content="https://easygas-bulawayo.netlify.app/">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://easygas-bulawayo.netlify.app/">
+<link rel="icon" href="easy-gas-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Easy Gas","url":"https://easygas-bulawayo.netlify.app/","logo":"https://easygas-bulawayo.netlify.app/easy-gas-logo.png","telephone":"+263789184693","paymentAccepted":"EcoCash, Cash","openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"06:00","closes":"22:00"},"address":{"@type":"PostalAddress","streetAddress":"8182 Gwabalanda, Luveve","addressLocality":"Bulawayo","addressCountry":"ZW"},"areaServed":[{"@type":"Place","name":"Entumbane"},{"@type":"Place","name":"Gwabalanda"},{"@type":"Place","name":"Mpopoma"},{"@type":"Place","name":"Luveve Road"}],"makesOffer":{"@type":"Offer","itemOffered":{"@type":"Service","name":"LPG cylinder refill"},"priceSpecification":{"@type":"UnitPriceSpecification","price":"1.90","priceCurrency":"USD","unitCode":"KGM"}}}
+</script>
+<style>
+  :root {
+    /* Colours sampled from the Easy Gas logo */
+    --blue: #015bad;
+    --red: #da1821;
+    --ink: #162027;
+    --wa: #128c4a;
+    --wa-dark: #0b6b37;
+    --paper: #f6f8fb;
+    --line: #e1e6ee;
+    --muted: #5a6574;
+    --radius: 18px;
+    --shadow: 0 1px 2px rgb(16 24 40 / .05), 0 10px 30px -12px rgb(16 24 40 / .18);
+    --bar: 0px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--ink); background: #fff; line-height: 1.55; padding-bottom: calc(var(--bar) + env(safe-area-inset-bottom)); }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  h1, h2, h3 { line-height: 1.08; letter-spacing: -0.02em; margin: 0; }
+  p { margin: 0; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+  .eyebrow { color: var(--red); font-weight: 800; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
+  .num { font-variant-numeric: tabular-nums; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .skip { position: absolute; left: -999px; top: 8px; background: #fff; padding: 8px 12px; border-radius: 8px; z-index: 100; }
+  .skip:focus { left: 8px; }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 14px; font: inherit; font-weight: 700; font-size: 16px; text-decoration: none; border: 0; cursor: pointer; transition: background-color .15s, transform .1s; }
+  .btn:active { transform: translateY(1px); }
+  .btn-wa { background: var(--wa); color: #fff; box-shadow: var(--shadow); }
+  .btn-wa:hover { background: var(--wa-dark); }
+  .btn-ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--blue); }
+  .btn-call { background: var(--ink); color: #fff; }
+  .btn-call:hover { background: #24323d; }
+  .head-actions { display: flex; gap: 8px; align-items: center; }
+  .btn svg { width: 22px; height: 22px; flex: none; }
+  .perks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .perk { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: 14px; font-weight: 700; }
+  .perk.free { background: #eaf6ee; border-color: #bfe3cb; color: var(--wa-dark); }
+  .small-note { background: #fff8e8; border: 1px solid #f3d58b; border-radius: 14px; padding: 14px 16px; margin-top: 14px; font-size: 15px; }
+  .small-note .ctas { margin-top: 12px; gap: 8px; }
+  .small-note .btn { min-height: 44px; font-size: 15px; padding: 0 16px; }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 40; background: rgb(255 255 255 / .92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 16px; }
+  header nav { display: none; gap: 28px; font-weight: 700; font-size: 15px; }
+  header nav a { text-decoration: none; color: rgb(22 32 39 / .8); }
+  header nav a:hover { color: var(--blue); }
+  .logo { height: 46px; width: auto; }
+  .head-cta { display: none; min-height: 44px; font-size: 15px; padding: 0 18px; }
+
+  /* Hero */
+  .hero { background: radial-gradient(900px 420px at 95% -10%, rgb(1 91 173 / .13), transparent 65%), radial-gradient(700px 380px at -10% 110%, rgb(218 24 33 / .08), transparent 60%), linear-gradient(180deg, #fff, var(--paper)); }
+  .hero .wrap { display: grid; gap: 40px; padding-top: 44px; padding-bottom: 56px; align-items: center; }
+  .hero h1 { font-size: clamp(2.6rem, 8vw, 4.4rem); font-weight: 800; margin-top: 12px; }
+  .hero .lede { font-size: 1.15rem; color: rgb(22 32 39 / .75); margin-top: 18px; max-width: 34rem; }
+  .price-tag { display: inline-flex; align-items: baseline; gap: 6px; margin-top: 26px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 22px; box-shadow: var(--shadow); }
+  .price-tag small { display: block; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .price-tag strong { font-size: 2.6rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; line-height: 1; }
+  .price-tag span { font-weight: 700; color: rgb(22 32 39 / .7); font-size: 1.1rem; }
+  .ctas { display: flex; flex-direction: column; gap: 12px; margin-top: 26px; }
+  .hero-card { position: relative; background: #fff; border: 1px solid var(--line); border-radius: 28px; padding: 32px 28px 26px; box-shadow: var(--shadow); max-width: 420px; width: 100%; margin: 0 auto; text-align: center; }
+  .hero-card .big-logo { width: 100%; max-width: 320px; height: auto; margin: 0 auto; }
+  .hero-card .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 26px; }
+  .hero-card .facts div { background: var(--paper); border-radius: 14px; padding: 12px 6px; font-size: 13px; color: var(--muted); }
+  .hero-card .facts b { display: block; font-size: 15px; color: var(--ink); }
+
+  section { padding: 64px 0; }
+  .section-title h2 { font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight: 800; margin-top: 8px; }
+  .section-title p { color: var(--muted); margin-top: 10px; max-width: 36rem; }
+
+  /* Order builder */
+  #order { background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .order-grid { display: grid; gap: 32px; margin-top: 28px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 22px; box-shadow: var(--shadow); }
+  fieldset { border: 0; padding: 0; margin: 0 0 22px; }
+  legend { font-weight: 800; font-size: 1.05rem; margin-bottom: 12px; padding: 0; }
+  label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .hint { font-size: 13px; color: var(--muted); margin: -2px 0 8px; }
+  input[type=text], input[type=tel], textarea, select { width: 100%; min-height: 50px; border: 1.5px solid #cfd6e1; border-radius: 12px; padding: 10px 14px; font: inherit; font-size: 16px; color: var(--ink); background: #fff; }
+  textarea { min-height: 76px; resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgb(1 91 173 / .15); }
+  [aria-invalid=true] { border-color: #c81e1e !important; }
+  .err { color: #b91c1c; font-size: 14px; font-weight: 600; margin-top: 6px; min-height: 0; }
+  .row { display: grid; gap: 16px; }
+  .field { margin-bottom: 16px; }
+  .kg { display: flex; align-items: stretch; max-width: 240px; }
+  .kg button { width: 52px; border: 1.5px solid #cfd6e1; background: var(--paper); font: inherit; font-size: 22px; font-weight: 700; cursor: pointer; color: var(--ink); }
+  .kg button:first-child { border-radius: 12px 0 0 12px; border-right: 0; }
+  .kg button:last-child { border-radius: 0 12px 12px 0; border-left: 0; }
+  .kg input { border-radius: 0; text-align: center; font-weight: 800; font-size: 20px; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 360px; }
+  .seg button { min-height: 52px; border-radius: 12px; border: 1.5px solid #cfd6e1; background: #fff; font: inherit; font-weight: 700; font-size: 16px; cursor: pointer; color: var(--ink); }
+  .seg button[aria-checked=true] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .estimate { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin: 4px 0 22px; }
+  .estimate dl { margin: 10px 0 0; display: grid; gap: 8px; font-size: 15px; }
+  .estimate dl div { display: flex; justify-content: space-between; gap: 12px; }
+  .estimate dt { color: var(--muted); }
+  .estimate dd { margin: 0; font-weight: 700; text-align: right; }
+  .estimate .total { border-top: 1px solid var(--line); padding-top: 10px; font-size: 17px; }
+  .estimate .total dt { color: var(--ink); font-weight: 800; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 12px; }
+  .side ul { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 14px; }
+  .side li { display: flex; gap: 12px; align-items: flex-start; }
+  .tick { flex: none; width: 26px; height: 26px; border-radius: 50%; background: rgb(1 91 173 / .1); color: var(--blue); display: grid; place-items: center; font-weight: 800; font-size: 14px; margin-top: 1px; }
+
+  /* Areas */
+  .areas { background: var(--ink); color: #fff; }
+  .areas .eyebrow { color: rgb(255 255 255 / .7); }
+  .areas .section-title p { color: rgb(255 255 255 / .75); }
+  .area-list { list-style: none; padding: 0; margin: 28px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .area-list li { background: rgb(255 255 255 / .09); border-radius: 14px; padding: 16px; font-weight: 700; display: flex; gap: 10px; align-items: center; }
+  .area-list svg { width: 20px; height: 20px; flex: none; opacity: .8; }
+  .ask { background: #fff; color: var(--ink); border-radius: 24px; padding: 24px; margin-top: 28px; }
+  .ask form { display: grid; gap: 12px; margin-top: 14px; }
+  .areas-grid { display: grid; gap: 24px; }
+
+  /* Steps */
+  .steps { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; counter-reset: s; }
+  .steps li { border: 1px solid var(--line); border-radius: 20px; padding: 22px; background: #fff; box-shadow: var(--shadow); counter-increment: s; }
+  .steps li::before { content: counter(s); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--red); color: #fff; font-weight: 800; margin-bottom: 14px; }
+  .steps h3 { font-size: 1.15rem; }
+  .steps p { color: var(--muted); margin-top: 6px; font-size: 15px; }
+
+  /* Pick-up */
+  .pickup { background: var(--paper); }
+  .pickup-card { display: grid; gap: 20px; align-items: center; }
+  .addr { font-size: 1.35rem; font-weight: 800; margin-top: 8px; }
+
+  /* FAQ */
+  .faq { max-width: 760px; }
+  details { border-bottom: 1px solid var(--line); }
+  details:first-of-type { border-top: 1px solid var(--line); }
+  summary { list-style: none; cursor: pointer; min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; font-weight: 700; padding: 10px 0; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-size: 24px; color: var(--muted); font-weight: 500; }
+  details[open] summary::after { content: "\2013"; }
+  details p { padding: 0 0 18px; color: rgb(22 32 39 / .8); }
+
+  /* Final CTA */
+  .final { background: linear-gradient(135deg, var(--blue), #01427e); color: #fff; text-align: center; border-radius: 28px; padding: 48px 24px; }
+  .final h2 { font-size: clamp(1.9rem, 5vw, 2.8rem); font-weight: 800; }
+  .final p { color: rgb(255 255 255 / .85); margin: 12px auto 24px; max-width: 30rem; }
+  .final .btn-wa { background: #fff; color: var(--wa-dark); }
+  .final .btn-wa:hover { background: #effaf3; }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: grid; gap: 8px; }
+
+  /* Mobile bottom bar; body padding reserves its space so content is never covered */
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgb(255 255 255 / .96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 10px 14px max(10px, env(safe-area-inset-bottom)); }
+  .bar { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
+  .bar .btn { width: 100%; padding: 0 12px; }
+
+  @media (max-width: 767px) { body { --bar: 74px; } }
+  @media (min-width: 640px) {
+    .ctas { flex-direction: row; }
+    .row { grid-template-columns: 1fr 1fr; }
+    .head-cta { display: inline-flex; }
+    .area-list { grid-template-columns: repeat(4, 1fr); }
+    .steps { grid-template-columns: repeat(3, 1fr); }
+    .ask form { grid-template-columns: 1fr auto; }
+  }
+  @media (min-width: 768px) {
+    .bar { display: none; }
+    header nav { display: flex; }
+    .logo { height: 54px; }
+    section { padding: 88px 0; }
+    .card { padding: 32px; }
+  }
+  @media (min-width: 960px) {
+    .hero .wrap { grid-template-columns: 1.2fr 1fr; padding-top: 72px; padding-bottom: 88px; }
+    .order-grid { grid-template-columns: .8fr 1.2fr; }
+    .areas-grid { grid-template-columns: 1fr 1fr; align-items: start; }
+    .areas-grid .ask { margin-top: 0; }
+    .pickup-card { grid-template-columns: 1fr auto; }
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .rise { animation: rise .6s cubic-bezier(.22,1,.36,1) both; }
+  .rise.d1 { animation-delay: .08s; } .rise.d2 { animation-delay: .16s; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .rise { animation: none; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12.04 2a9.9 9.9 0 0 0-8.5 15l-1.4 5 5.1-1.3A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3 .8.8-2.95-.2-.31a8.2 8.2 0 1 1 6.9 3.79Zm4.5-6.15c-.25-.12-1.46-.72-1.69-.8-.23-.08-.39-.12-.55.12-.16.25-.63.8-.78.97-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.34-2.92c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.42l-.75-1.8c-.2-.48-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.74 2.74 0 0 0-.86 2.04 4.77 4.77 0 0 0 1 2.53 10.9 10.9 0 0 0 4.18 3.69c1.55.67 2.16.73 2.94.61.47-.07 1.46-.6 1.66-1.17.2-.58.2-1.07.15-1.17-.06-.1-.22-.16-.47-.28Z"/></symbol>
+  <symbol id="i-call" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.44c.9.34 1.84.57 2.8.7a2 2 0 0 1 1.7 2Z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+
+<header>
+  <div class="wrap">
+    <a href="#top" aria-label="Easy Gas home"><img class="logo" src="easy-gas-logo.png" alt="Easy Gas" width="600" height="221"></a>
+    <nav aria-label="Main">
+      <a href="#order">Order</a>
+      <a href="#areas">Delivery areas</a>
+      <a href="#how">How it works</a>
+      <a href="#pickup">Pick-up</a>
+      <a href="#faq">FAQs</a>
+    </nav>
+    <div class="head-actions">
+      <a class="btn btn-call head-cta" data-call href="tel:+263789184693"><svg><use href="#i-call"/></svg>Call</a>
+      <a class="btn btn-wa head-cta" data-wa="greeting" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Order on WhatsApp</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- Hero -->
+  <section class="hero" id="top" style="padding:0">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow rise">LPG cylinder refills &#xb7; Bulawayo</p>
+        <h1 class="rise d1">Keep Your Home Cooking.</h1>
+        <p class="lede rise d2">Great-value LPG cylinder refills in Bulawayo. <strong>Free delivery on 9 kg or more</strong> around Entumbane, Gwabalanda, Mpopoma and Luveve Road, or collect any amount from us.</p>
+        <div class="price-tag rise d2">
+          <div><small>Refill price</small><strong class="num" data-price>$1.90</strong> <span data-unit>/ kg</span></div>
+        </div>
+        <div class="perks rise d2">
+          <span class="perk free">Free delivery from 9 kg</span>
+          <span class="perk">Open 6am&#x2013;10pm, every day</span>
+        </div>
+        <div class="ctas rise d2">
+          <a class="btn btn-wa" data-wa="greeting" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Order on WhatsApp</a>
+          <a class="btn btn-call" data-call href="tel:+263789184693"><svg><use href="#i-call"/></svg>Call <span class="num" data-phone>078 918 4693</span></a>
+        </div>
+        <p class="rise d2" style="margin-top:14px"><a href="#areas" style="font-weight:700;color:var(--blue)">Check Delivery Coverage &#x2192;</a></p>
+      </div>
+      <div class="hero-card rise d1">
+        <img class="big-logo" src="easy-gas-logo.png" alt="" width="600" height="221">
+        <div class="facts">
+          <div><b class="num" data-price>$1.90</b>per kg</div>
+          <div><b>Free</b>delivery from 9 kg</div>
+          <div><b>6am&#x2013;10pm</b>every day</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Order builder: builds a WhatsApp message, nothing is stored -->
+  <section id="order">
+    <div class="wrap">
+      <div class="order-grid">
+        <div class="side">
+          <div class="section-title">
+            <p class="eyebrow">Order in a minute</p>
+            <h2>Work out your cost, then send it on WhatsApp</h2>
+            <p>Tell us how much gas you need and where you are. We'll type out your order in WhatsApp so you just press send.</p>
+          </div>
+          <ul>
+            <li><span class="tick">&#x2713;</span><span>You pay for the weight of gas you ask for, not the size of the cylinder.</span></li>
+            <li><span class="tick">&#x2713;</span><span><strong>Free delivery</strong> on refills of 9 kg or more in our delivery areas. Smaller refills are always welcome for collection.</span></li>
+            <li><span class="tick">&#x2713;</span><span>We confirm the final weight and total on WhatsApp before you pay.</span></li>
+            <li><span class="tick">&#x2713;</span><span>Pay with <strong>EcoCash</strong> or <strong>cash</strong>. We agree the details with you on WhatsApp.</span></li>
+          </ul>
+        </div>
+
+        <form class="card" id="order-form" novalidate>
+          <fieldset>
+            <legend>1. How much gas?</legend>
+            <label for="kg">Refill weight (kg)</label>
+            <p class="hint" id="kg-hint">Never ask for more than your cylinder is permitted to hold. We confirm the weight we supply.</p>
+            <div class="kg">
+              <button type="button" data-step="-1" aria-label="Less gas">&#x2212;</button>
+              <input type="text" id="kg" inputmode="decimal" autocomplete="off" placeholder="e.g. 9" aria-describedby="kg-hint kg-err">
+              <button type="button" data-step="1" aria-label="More gas">+</button>
+            </div>
+            <p class="err" id="kg-err" role="alert"></p>
+          </fieldset>
+
+          <fieldset>
+            <legend>2. Delivery or collection?</legend>
+            <div class="seg" role="radiogroup" aria-label="Delivery or collection">
+              <button type="button" role="radio" aria-checked="true" data-mode="delivery">Delivery (9 kg+)</button>
+              <button type="button" role="radio" aria-checked="false" data-mode="collection">I'll collect</button>
+            </div>
+            <div class="small-note" id="small-note" hidden role="status">
+              <p><strong>Delivery is free on refills of 9 kg or more.</strong> For <span id="small-kg">this amount</span>, please collect from us at 8182 Gwabalanda, Luveve. We're open 6am&#x2013;10pm, every day.</p>
+              <div class="ctas">
+                <button type="button" class="btn btn-ghost" id="to-collect">Collect instead</button>
+                <button type="button" class="btn btn-wa" id="to-nine">Make it 9 kg with free delivery</button>
+              </div>
+            </div>
+            <div class="field" id="area-field" style="margin-top:16px">
+              <label for="area">Your area</label>
+              <select id="area" aria-describedby="area-err">
+                <option value="">Choose your area&#x2026;</option>
+              </select>
+              <p class="err" id="area-err" role="alert"></p>
+            </div>
+            <div class="field" id="other-field" hidden>
+              <label for="other">Your suburb</label>
+              <p class="hint">We'll let you know on WhatsApp whether we can deliver there.</p>
+              <input type="text" id="other" aria-describedby="other-err">
+              <p class="err" id="other-err" role="alert"></p>
+            </div>
+            <p class="hint" id="collect-note" hidden style="margin-top:12px">Collect any amount from <strong>8182 Gwabalanda, Luveve</strong>, 6am&#x2013;10pm every day. Message us and we'll have it ready.</p>
+          </fieldset>
+
+          <div class="estimate" aria-live="polite">
+            <strong>Your estimate</strong>
+            <dl>
+              <div><dt id="gas-label">Gas</dt><dd class="num" id="gas-out">&#x2014;</dd></div>
+              <div id="del-row"><dt>Delivery</dt><dd id="del-out">Confirmed on WhatsApp</dd></div>
+              <div class="total"><dt>Estimated total</dt><dd class="num" id="total-out">&#x2014;</dd></div>
+            </dl>
+          </div>
+
+          <fieldset>
+            <legend>3. Your details</legend>
+            <div class="row">
+              <div class="field">
+                <label for="name">Name</label>
+                <input type="text" id="name" autocomplete="name" aria-describedby="name-err">
+                <p class="err" id="name-err" role="alert"></p>
+              </div>
+              <div class="field" id="addr-field">
+                <label for="addr">Delivery address</label>
+                <input type="text" id="addr" autocomplete="street-address" placeholder="House number, street, landmark" aria-describedby="addr-err">
+                <p class="err" id="addr-err" role="alert"></p>
+              </div>
+            </div>
+            <div class="field">
+              <p id="pay-label" style="font-weight:700;font-size:14px;margin:0 0 6px">How would you like to pay?</p>
+              <div class="seg" role="radiogroup" aria-labelledby="pay-label">
+                <button type="button" role="radio" aria-checked="true" data-pay="EcoCash">EcoCash</button>
+                <button type="button" role="radio" aria-checked="false" data-pay="Cash">Cash</button>
+              </div>
+              <p class="hint" style="margin-top:8px">We'll confirm the total and payment details on WhatsApp. Nothing is paid on this website.</p>
+            </div>
+            <div class="field">
+              <label for="notes">Notes <span style="font-weight:500;color:var(--muted)">(optional)</span></label>
+              <textarea id="notes" placeholder="e.g. cylinder size, best time to deliver"></textarea>
+            </div>
+          </fieldset>
+
+          <button class="btn btn-wa" type="submit" style="width:100%"><svg><use href="#i-wa"/></svg>Send my order on WhatsApp</button>
+          <p class="note">This opens WhatsApp with your order typed out. It's only sent when you press send. We'll reply to confirm availability, the total and the delivery or collection time. No payment is taken on this website.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Delivery areas -->
+  <section class="areas" id="areas">
+    <div class="wrap areas-grid">
+      <div>
+        <div class="section-title">
+          <p class="eyebrow">Delivery areas</p>
+          <h2>Where we deliver</h2>
+          <p><strong>Free delivery on refills of 9 kg or more</strong> to the areas below. We don't cover all of Bulawayo, so if you're nearby, ask us first. Need less than 9 kg? Collect from us any day, 6am&#x2013;10pm.</p>
+        </div>
+        <ul class="area-list" id="area-list"></ul>
+      </div>
+      <div class="ask">
+        <h3 style="font-size:1.3rem">Live nearby? Ask us.</h3>
+        <p style="color:var(--muted);margin-top:6px">Type your area and we'll answer on WhatsApp.</p>
+        <form id="ask-form" novalidate>
+          <div>
+            <label class="sr" for="ask-area">Your suburb or area</label>
+            <input type="text" id="ask-area" placeholder="Your suburb or area" aria-describedby="ask-err">
+            <p class="err" id="ask-err" role="alert"></p>
+          </div>
+          <button class="btn btn-wa" type="submit"><svg><use href="#i-wa"/></svg>Ask on WhatsApp</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how">
+    <div class="wrap">
+      <div class="section-title">
+        <p class="eyebrow">How it works</p>
+        <h2>Three simple steps</h2>
+      </div>
+      <ol class="steps">
+        <li><h3>Tell us what you need</h3><p>Send the refill quantity and your area on WhatsApp.</p></li>
+        <li><h3>We confirm the details</h3><p>We confirm availability, the total cost, and whether it's collection or delivery.</p></li>
+        <li><h3>Get your refill</h3><p>Receive your refill, or collect it, as agreed.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Pick-up -->
+  <section class="pickup" id="pickup">
+    <div class="wrap">
+      <div class="card pickup-card">
+        <div>
+          <p class="eyebrow">Collect any amount</p>
+          <p class="addr">8182 Gwabalanda, Luveve, Bulawayo</p>
+          <p style="font-weight:700;margin-top:6px">Open 6am&#x2013;10pm, Monday to Sunday</p>
+          <p style="color:var(--muted);margin-top:6px">Bring your cylinder, big or small. Message us first so we can have your refill ready.</p>
+        </div>
+        <div class="ctas" style="margin-top:0">
+          <a class="btn btn-wa" data-wa="collect" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Arrange collection</a>
+          <a class="btn btn-call" data-call href="tel:+263789184693"><svg><use href="#i-call"/></svg>Call us</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=8182+Gwabalanda%2C+Luveve%2C+Bulawayo%2C+Zimbabwe" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg>Directions</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap faq">
+      <div class="section-title" style="margin-bottom:28px">
+        <p class="eyebrow">FAQs</p>
+        <h2>Questions customers ask</h2>
+      </div>
+      <details><summary>How much does a refill cost?</summary><p><span data-price>$1.90</span> per kg. For example, 9 kg of gas costs <span data-example>$17.10</span>, plus any delivery fee.</p></details>
+      <details><summary>How much gas can I order?</summary><p>Tell us how many kilograms you need. Never ask for more than your cylinder is permitted to hold. We confirm the final weight we supply.</p></details>
+      <details><summary>Where do you deliver?</summary><p>Entumbane, Gwabalanda, Mpopoma and areas along Luveve Road. If you're nearby, ask us on WhatsApp and we'll confirm whether we can reach you.</p></details>
+      <details><summary>Is delivery free?</summary><p>Yes, on refills of 9 kg or more to Entumbane, Gwabalanda, Mpopoma and areas along Luveve Road. For refills under 9 kg, please collect from us; any amount is welcome. If you live nearby but outside these areas, ask us on WhatsApp.</p></details>
+      <details><summary>Can I collect instead?</summary><p>Yes, any amount. Collect from 8182 Gwabalanda, Luveve, 6am&#x2013;10pm, Monday to Sunday. Message us first so your refill is ready.</p></details>
+      <details><summary>When are you open?</summary><p>Every day, Monday to Sunday, from 6am to 10pm.</p></details>
+      <details><summary>How do I pay?</summary><p>We accept EcoCash and cash. Once we've confirmed your order and total on WhatsApp, we'll tell you how to pay. Nothing is paid on this website, and we never ask for your EcoCash PIN.</p></details>
+      <details><summary>What can I use LPG for?</summary><p>LPG is a practical fuel for household cooking and heating when used with appliances designed for it.</p></details>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="final">
+        <h2>Running low on gas?</h2>
+        <p>Send us the refill quantity and your area. We'll confirm the total and get it to you.</p>
+        <div class="ctas" style="justify-content:center">
+          <a class="btn btn-wa" data-wa="greeting" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Order on WhatsApp</a>
+          <a class="btn btn-ghost" data-call href="tel:+263789184693" style="background:transparent;color:#fff;border-color:rgb(255 255 255 / .5)"><svg><use href="#i-call"/></svg>Call <span class="num">078 918 4693</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>&#xa9; <span id="year">2026</span> Easy Gas &#xb7; 8182 Gwabalanda, Luveve, Bulawayo &#xb7; WhatsApp or call <a href="tel:+263789184693" data-call class="num">+263 78 918 4693</a></p>
+    <p>Open 6am&#x2013;10pm, Monday to Sunday. Free delivery on refills of 9 kg or more.</p>
+    <p>Use LPG only with appliances designed for it, and keep cylinders upright in a well-ventilated place.</p>
+  </div>
+</footer>
+
+<div class="bar"><a class="btn btn-wa" data-wa="greeting" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>WhatsApp</a><a class="btn btn-call" data-call href="tel:+263789184693"><svg><use href="#i-call"/></svg>Call</a></div>
+
+<script>
+/* \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Business settings: edit here \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+const CONFIG = {
+  name: "Easy Gas",
+  whatsapp: "263789184693",            // international format, digits only
+  phone: "263789184693",               // number for the Call buttons (same as WhatsApp for now)
+  priceCents: 190,                      // $1.90
+  currency: "$",
+  unit: "kg",
+  areas: ["Entumbane", "Gwabalanda", "Mpopoma", "Areas along Luveve Road"],
+  // Delivery fee per area in cents. Leave null when not decided: the page then says "confirmed on WhatsApp", never "free".
+  deliveryFees: { "Entumbane": 0, "Gwabalanda": 0, "Mpopoma": 0, "Areas along Luveve Road": 0 },
+  freeDeliveryMinKg: 9,                 // delivery is free from this weight up; smaller refills are collection only
+  pickupAddress: "8182 Gwabalanda, Luveve",
+};
+/* \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+(function () {
+  const $ = (s) => document.querySelector(s);
+  const money = (c) => CONFIG.currency + (c / 100).toFixed(2);
+  const wa = (text) => "https://wa.me/" + CONFIG.whatsapp + (text ? "?text=" + encodeURIComponent(text) : "");
+  // weight in hundredths of a kg; integer maths so money never drifts
+  const parseKg = (v) => { const s = String(v).trim().replace(",", "."); if (!/^\d{1,3}(\.\d{1,2})?$/.test(s)) return null; const [w, f = ""] = s.split("."); const c = +w * 100 + +(f + "00").slice(0, 2); return c > 0 && c <= 10000 ? c : null; };
+  const fmtKg = (c) => (c % 100 ? (c / 100).toString() : String(c / 100)) + " kg";
+  const subtotal = (ckg) => Math.floor((CONFIG.priceCents * ckg + 50) / 100);
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  document.querySelectorAll("[data-price]").forEach((el) => (el.textContent = money(CONFIG.priceCents)));
+  document.querySelectorAll("[data-example]").forEach((el) => (el.textContent = money(subtotal(900))));
+
+  const links = {
+    greeting: wa(`Hello ${CONFIG.name}, I'd like to order an LPG refill.`),
+    collect: wa(`Hello ${CONFIG.name}, I'd like to collect an LPG refill from ${CONFIG.pickupAddress}. When can I come?`),
+  };
+  document.querySelectorAll("[data-wa]").forEach((a) => (a.href = links[a.dataset.wa]));
+  document.querySelectorAll("[data-call]").forEach((a) => (a.href = "tel:+" + CONFIG.phone));
+
+  const pin = '<svg aria-hidden="true"><use href="#i-pin"/></svg>';
+  $("#area-list").innerHTML = CONFIG.areas.map((a) => `<li>${pin}${a}</li>`).join("");
+  $("#area").insertAdjacentHTML("beforeend", CONFIG.areas.map((a) => `<option>${a}</option>`).join("") + '<option value="other">Another area nearby (ask us)</option>');
+
+  let mode = "delivery";
+  let pay = "EcoCash";
+  document.querySelectorAll("[data-pay]").forEach((b) =>
+    b.addEventListener("click", () => {
+      pay = b.dataset.pay;
+      document.querySelectorAll("[data-pay]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+    }),
+  );
+  const kg = $("#kg"), area = $("#area"), other = $("#other"), name = $("#name"), addr = $("#addr"), notes = $("#notes");
+
+  function setErr(input, id, msg) {
+    $(id).textContent = msg || "";
+    input.setAttribute("aria-invalid", msg ? "true" : "false");
+  }
+
+  const minCkg = CONFIG.freeDeliveryMinKg * 100;
+  const tooSmall = () => { const c = parseKg(kg.value); return mode === "delivery" && c !== null && c < minCkg; };
+
+  function feeFor() {
+    if (mode !== "delivery") return { kind: "na" };
+    if (!area.value || area.value === "other") return { kind: "tbc" };
+    const f = CONFIG.deliveryFees[area.value];
+    return f === null || f === undefined ? { kind: "tbc" } : { kind: "known", cents: f };
+  }
+
+  function update() {
+    const c = parseKg(kg.value);
+    const fee = feeFor();
+    $("#gas-label").textContent = c ? `Gas \u00b7 ${fmtKg(c)} \u00d7 ${money(CONFIG.priceCents)}/${CONFIG.unit}` : "Gas";
+    $("#gas-out").textContent = c ? money(subtotal(c)) : "\u2014";
+    $("#del-row").hidden = mode !== "delivery";
+    $("#del-out").textContent = fee.kind === "known" ? (fee.cents === 0 ? "Free" : money(fee.cents)) : "Confirmed on WhatsApp";
+    $("#total-out").textContent = !c ? "\u2014" : fee.kind === "tbc" ? money(subtotal(c)) + " + delivery" : money(subtotal(c) + (fee.cents || 0));
+    const small = tooSmall();
+    $("#small-note").hidden = !small;
+    if (small) $("#small-kg").textContent = fmtKg(c);
+    $("#area-field").hidden = $("#addr-field").hidden = mode !== "delivery" || small;
+    $("#del-row").hidden = mode !== "delivery" || small;
+    if (small) $("#total-out").textContent = money(subtotal(c)) + " (collection)";
+    $("#other-field").hidden = !(mode === "delivery" && !small && area.value === "other");
+    $("#collect-note").hidden = mode !== "collection";
+  }
+
+  document.querySelectorAll("[data-step]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const c = parseKg(kg.value) || 0;
+      const next = Math.max(100, Math.min(10000, Math.round(c / 100) * 100 + Number(b.dataset.step) * 100));
+      kg.value = String(next / 100);
+      setErr(kg, "#kg-err", "");
+      update();
+    }),
+  );
+  document.querySelectorAll("[data-mode]").forEach((b) =>
+    b.addEventListener("click", () => {
+      mode = b.dataset.mode;
+      document.querySelectorAll("[data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+      update();
+    }),
+  );
+  [[kg, "#kg-err"], [area, "#area-err"], [other, "#other-err"], [name, "#name-err"], [addr, "#addr-err"]].forEach(([el, id]) =>
+    el.addEventListener("input", () => { setErr(el, id, ""); update(); }),
+  );
+  area.addEventListener("change", update);
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll("[data-mode]").forEach((x) => x.setAttribute("aria-checked", String(x.dataset.mode === m)));
+    update();
+  }
+  $("#to-collect").addEventListener("click", () => setMode("collection"));
+  $("#to-nine").addEventListener("click", () => { kg.value = String(CONFIG.freeDeliveryMinKg); setErr(kg, "#kg-err", ""); update(); });
+
+  $("#order-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const c = parseKg(kg.value);
+    const errs = [];
+    if (!c) errs.push([kg, "#kg-err", "Enter the weight in kg, e.g. 9 or 4.5."]);
+    if (c && mode === "delivery" && c < minCkg) errs.push([kg, "#kg-err", `Delivery is free from ${CONFIG.freeDeliveryMinKg} kg. Choose \u201cI'll collect\u201d or make it ${CONFIG.freeDeliveryMinKg} kg.`]);
+    if (mode === "delivery" && !(c && c < minCkg)) {
+      if (!area.value) errs.push([area, "#area-err", "Choose your area."]);
+      if (area.value === "other" && other.value.trim().length < 2) errs.push([other, "#other-err", "Tell us your suburb."]);
+      if (addr.value.trim().length < 5) errs.push([addr, "#addr-err", "Enter the delivery address."]);
+    }
+    if (name.value.trim().length < 2) errs.push([name, "#name-err", "Enter your name."]);
+    errs.forEach(([el, id, m]) => setErr(el, id, m));
+    if (errs.length) { errs[0][0].focus(); return; }
+
+    const fee = feeFor();
+    const where = area.value === "other" ? other.value.trim() + " (please confirm you deliver here)" : area.value;
+    const lines = [
+      `Hello ${CONFIG.name}, I'd like to order an LPG refill.`,
+      `Name: ${name.value.trim()}`,
+      `Refill: ${fmtKg(c)}`,
+      mode === "delivery" ? `Delivery to: ${where}` : `Collection from ${CONFIG.pickupAddress}`,
+      mode === "delivery" ? `Address: ${addr.value.trim()}` : null,
+      `Gas estimate: ${money(subtotal(c))} (${fmtKg(c)} \u00d7 ${money(CONFIG.priceCents)}/${CONFIG.unit})`,
+      mode === "delivery" ? (fee.kind === "known" ? `Delivery: ${fee.cents === 0 ? "free (9 kg or more)" : money(fee.cents)}` : "Delivery fee: please confirm (outside listed areas)") : null,
+      `Payment: ${pay}`,
+      notes.value.trim() ? `Notes: ${notes.value.trim()}` : null,
+      "Please confirm availability and the total. Thank you.",
+    ].filter(Boolean);
+    window.open(wa(lines.join("\n")), "_blank", "noopener");
+  });
+
+  $("#ask-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = $("#ask-area").value.trim();
+    if (v.length < 2) { setErr($("#ask-area"), "#ask-err", "Type your suburb or area."); $("#ask-area").focus(); return; }
+    setErr($("#ask-area"), "#ask-err", "");
+    window.open(wa(`Hello ${CONFIG.name}, do you deliver LPG refills to ${v}? What would the delivery fee be?`), "_blank", "noopener");
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>

@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"LocalBusiness","name":"Easy Gas","url":"https://easygas-bulawayo.netlify.app/","logo":"https://easygas-bulawayo.netlify.app/easy-gas-logo.png","telephone":"+263789184693","address":{"@type":"PostalAddress","streetAddress":"8182 Gwabalanda, Luveve","addressLocality":"Bulawayo","addressCountry":"ZW"},"areaServed":[{"@type":"Place","name":"Entumbane"},{"@type":"Place","name":"Gwabalanda"},{"@type":"Place","name":"Mpopoma"},{"@type":"Place","name":"Luveve Road"}],"makesOffer":{"@type":"Offer","itemOffered":{"@type":"Service","name":"LPG cylinder refill"},"priceSpecification":{"@type":"UnitPriceSpecification","price":"1.90","priceCurrency":"USD","unitCode":"KGM"}}}
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Easy Gas","url":"https://easygas-bulawayo.netlify.app/","logo":"https://easygas-bulawayo.netlify.app/easy-gas-logo.png","telephone":"+263789184693","paymentAccepted":"EcoCash, Cash","address":{"@type":"PostalAddress","streetAddress":"8182 Gwabalanda, Luveve","addressLocality":"Bulawayo","addressCountry":"ZW"},"areaServed":[{"@type":"Place","name":"Entumbane"},{"@type":"Place","name":"Gwabalanda"},{"@type":"Place","name":"Mpopoma"},{"@type":"Place","name":"Luveve Road"}],"makesOffer":{"@type":"Offer","itemOffered":{"@type":"Service","name":"LPG cylinder refill"},"priceSpecification":{"@type":"UnitPriceSpecification","price":"1.90","priceCurrency":"USD","unitCode":"KGM"}}}
 </script>
 <style>
   :root {
@@ -251,7 +251,7 @@
         <div class="facts">
           <div><b class="num" data-price>$1.90</b>per kg</div>
           <div><b>Local</b>delivery</div>
-          <div><b>Quick</b>WhatsApp orders</div>
+          <div><b>EcoCash</b>or cash</div>
         </div>
       </div>
     </div>
@@ -271,6 +271,7 @@
             <li><span class="tick">&#x2713;</span><span>You pay for the weight of gas you ask for, not the size of the cylinder.</span></li>
             <li><span class="tick">&#x2713;</span><span>Delivery fees depend on your area. We confirm the fee with you before delivery.</span></li>
             <li><span class="tick">&#x2713;</span><span>We confirm the final weight and total on WhatsApp before you pay.</span></li>
+            <li><span class="tick">&#x2713;</span><span>Pay with <strong>EcoCash</strong> or <strong>cash</strong>. We agree the details with you on WhatsApp.</span></li>
           </ul>
         </div>
 
@@ -331,6 +332,14 @@
                 <input type="text" id="addr" autocomplete="street-address" placeholder="House number, street, landmark" aria-describedby="addr-err">
                 <p class="err" id="addr-err" role="alert"></p>
               </div>
+            </div>
+            <div class="field">
+              <p id="pay-label" style="font-weight:700;font-size:14px;margin:0 0 6px">How would you like to pay?</p>
+              <div class="seg" role="radiogroup" aria-labelledby="pay-label">
+                <button type="button" role="radio" aria-checked="true" data-pay="EcoCash">EcoCash</button>
+                <button type="button" role="radio" aria-checked="false" data-pay="Cash">Cash</button>
+              </div>
+              <p class="hint" style="margin-top:8px">We'll confirm the total and payment details on WhatsApp. Nothing is paid on this website.</p>
             </div>
             <div class="field">
               <label for="notes">Notes <span style="font-weight:500;color:var(--muted)">(optional)</span></label>
@@ -416,7 +425,7 @@
       <details><summary>Where do you deliver?</summary><p>Entumbane, Gwabalanda, Mpopoma and areas along Luveve Road. If you're nearby, ask us on WhatsApp and we'll confirm whether we can reach you.</p></details>
       <details><summary>How much is delivery?</summary><p>The delivery fee depends on where you are. We confirm it with you on WhatsApp before we deliver.</p></details>
       <details><summary>Can I collect instead?</summary><p>Yes. Collect from 8182 Gwabalanda, Luveve. Message us first so your refill is ready.</p></details>
-      <details><summary>How do I pay?</summary><p>We agree payment when we confirm your order on WhatsApp. We never ask for card details on this website.</p></details>
+      <details><summary>How do I pay?</summary><p>We accept EcoCash and cash. Once we've confirmed your order and total on WhatsApp, we'll tell you how to pay. Nothing is paid on this website, and we never ask for your EcoCash PIN.</p></details>
       <details><summary>What can I use LPG for?</summary><p>LPG is a practical fuel for household cooking and heating when used with appliances designed for it.</p></details>
     </div>
   </section>
@@ -485,6 +494,13 @@ const CONFIG = {
   $("#area").insertAdjacentHTML("beforeend", CONFIG.areas.map((a) => `<option>${a}</option>`).join("") + '<option value="other">Another area nearby (ask us)</option>');
 
   let mode = "delivery";
+  let pay = "EcoCash";
+  document.querySelectorAll("[data-pay]").forEach((b) =>
+    b.addEventListener("click", () => {
+      pay = b.dataset.pay;
+      document.querySelectorAll("[data-pay]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+    }),
+  );
   const kg = $("#kg"), area = $("#area"), other = $("#other"), name = $("#name"), addr = $("#addr"), notes = $("#notes");
 
   function setErr(input, id, msg) {
@@ -557,6 +573,7 @@ const CONFIG = {
       mode === "delivery" ? `Address: ${addr.value.trim()}` : null,
       `Gas estimate: ${money(subtotal(c))} (${fmtKg(c)} \u00d7 ${money(CONFIG.priceCents)}/${CONFIG.unit})`,
       mode === "delivery" ? (fee.kind === "known" ? `Delivery fee: ${fee.cents === 0 ? "no charge" : money(fee.cents)}` : "Delivery fee: please confirm") : null,
+      `Payment: ${pay}`,
       notes.value.trim() ? `Notes: ${notes.value.trim()}` : null,
       "Please confirm availability and the total. Thank you.",
     ].filter(Boolean);

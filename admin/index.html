@@ -378,6 +378,7 @@ async function flush() {
   if (flushing || !queue.length) return refreshSync();
   flushing = true;
   refreshSync();
+  let missedChanges = false;
   while (queue.length) {
     const op = queue[0];
     const r = await api(op.action, op.data);
@@ -391,7 +392,9 @@ async function flush() {
     queue.shift();
     saveQ();
     if (r.ok) {
-      if (r.data.rev) knownRev = r.data.rev;
+      // If the server's counter jumped by more than our own change, another phone saved in between.
+      if (r.data.rev && r.data.rev !== knownRev && r.data.rev !== knownRev + 1) missedChanges = true;
+      if (r.data.rev) knownRev = Math.max(knownRev, r.data.rev);
       if (r.data.entry && op.kind) { const list = L[LIST[op.kind]]; const i = list.findIndex((e) => e.id === r.data.entry.id); if (i >= 0) list[i] = r.data.entry; }
     } else {
       toast(r.data.error || "That change couldn't be saved.", null, true);
@@ -399,6 +402,7 @@ async function flush() {
     }
   }
   flushing = false;
+  if (missedChanges) { await load(); toast("Updated with changes from another device"); }
   refreshSync();
   render();
 }
@@ -479,7 +483,7 @@ function go(v) {
   window.scrollTo(0, 0);
   render();
 }
-$$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go)));
+$$("[data-go]").forEach((b) => b.addEventListener("click", () => { if (b.dataset.go === "today") day = today(); go(b.dataset.go); }));
 
 const byTimeDesc = (a, b) => { const ka = `${a.e.date}T${a.e.time || ""}`, kb = `${b.e.date}T${b.e.time || ""}`; return ka < kb ? 1 : ka > kb ? -1 : 0; };
 
@@ -489,7 +493,7 @@ function rowHtml({ kind, e }) {
   if (kind === "sale") {
     const diff = e.receivedCents - e.expectedCents;
     const d = diff ? ` \u00b7 ${diff < 0 ? "discount" : "extra"} ${money(Math.abs(diff))}` : "";
-    return `<button class="item" data-edit="sale:${e.id}"><span class="ico sale">S</span><span class="t"><b>${kg(e.ckg)} \u00b7 ${esc(e.method || "Cash")}${p}</b><span>${esc(e.time || "")}${d}${note}</span></span><span class="amt pos num">+${money(e.receivedCents)}</span></button>`;
+    return `<button class="item" data-edit="sale:${e.id}"><span class="ico sale">S</span><span class="t"><b>${kg(e.ckg)} \u00b7 ${e.method ? esc(e.method) : "payment not recorded"}${p}</b><span>${esc(e.time || "")}${d}${note}</span></span><span class="amt pos num">+${money(e.receivedCents)}</span></button>`;
   }
   if (kind === "restock") return `<button class="item" data-edit="restock:${e.id}"><span class="ico restock">R</span><span class="t"><b>Restock ${kg(e.ckg)}${p}</b><span>${esc(e.time || "")} \u00b7 ${money(e.rateCents)}/kg${e.bulk ? ' <span class="badge bulk">bulk</span>' : ""}${note}</span></span><span class="amt neg num">-${money(e.paidCents)}</span></button>`;
   return `<button class="item" data-edit="expense:${e.id}"><span class="ico expense">E</span><span class="t"><b>${esc(e.category)}${p}</b><span>${esc(e.time || "")}${note}</span></span><span class="amt neg num">-${money(e.amountCents)}</span></button>`;
@@ -530,6 +534,7 @@ function range() {
   if (period === "custom") return [$("#from").value || null, $("#to").value || null];
   return [null, null];
 }
+const minus = (c) => (c ? "-" + money(c) : money(0));
 function signed(el, c) { el.textContent = money(c); el.classList.toggle("pos", c > 0); el.classList.toggle("neg", c < 0); }
 
 function renderReports() {
@@ -545,9 +550,9 @@ function renderReports() {
   signed($("#r-diff"), s.sales.differenceCents);
   $("#r-methods").innerHTML = Object.entries(s.sales.byMethod).map(([k, v]) => `<div><dt>Paid by ${esc(k)}</dt><dd class="num">${money(v)}</dd></div>`).join("");
   $("#r-in").textContent = money(s.sales.receivedCents);
-  $("#r-cogs").textContent = "-" + money(s.profitOnGasSold.costOfGasSoldCents);
+  $("#r-cogs").textContent = minus(s.profitOnGasSold.costOfGasSoldCents);
   signed($("#r-gross"), s.profitOnGasSold.grossProfitCents);
-  $("#r-exp").textContent = "-" + money(s.expenses.totalCents);
+  $("#r-exp").textContent = minus(s.expenses.totalCents);
   signed($("#r-net"), s.profitOnGasSold.netProfitCents);
   $("#r-bkg").textContent = kg(s.gasBought.kgCkg);
   $("#r-bpaid").textContent = money(s.gasBought.paidCents);
@@ -630,7 +635,7 @@ function openSheet(kind, entry) {
       <input class="f big num" id="x-received" inputmode="decimal" value="${entry ? dec(entry.receivedCents) : ""}" placeholder="0.00">
       <div class="hint" id="x-price-hint"></div>
       <label class="l">Paid by</label>
-      <div class="seg" id="x-method">${L.methods.map((m) => `<button type="button" class="chip" data-m="${esc(m)}" aria-pressed="${(entry?.method || lastMethod) === m}">${esc(m)}</button>`).join("")}</div>
+      <div class="seg" id="x-method">${L.methods.map((m) => `<button type="button" class="chip" data-m="${esc(m)}" aria-pressed="${(entry ? entry.method : lastMethod) === m}">${esc(m)}</button>`).join("")}</div>
       ${when}<div id="x-msg"></div>${buttons}`;
     let touched = false; // has the amount been typed in this form?
     const sync = (kgChanged) => {
@@ -665,7 +670,13 @@ function openSheet(kind, entry) {
       <div class="note-box" id="x-preview"></div>
       <label class="l" for="x-paid">Amount actually paid ($)</label>
       <input class="f num" id="x-paid" inputmode="decimal" value="${entry && entry.paidCents !== entry.calcCents ? dec(entry.paidCents) : ""}" placeholder="Leave blank to use the price above">
+      <div class="hint" id="x-paid-note" hidden>The amount changed, so the custom amount paid was cleared. Enter it again if it was different.</div>
       ${when}<div id="x-msg"></div>${buttons}`;
+    let paidTyped = false;
+    const quantityChanged = () => {
+      if (!paidTyped && $("#x-paid").value) { $("#x-paid").value = ""; $("#x-paid-note").hidden = false; }
+      sync();
+    };
     const sync = () => {
       let c = parseKg($("#x-kg").value);
       const t = Number($("#x-tanks").value);
@@ -678,8 +689,9 @@ function openSheet(kind, entry) {
       else h += `<br><span class="muted">Fill ${kg(prices.bulkMinCkg - c)} more in this restock to pay ${money(prices.bulkBuyCents)}/kg.</span>`;
       $("#x-preview").innerHTML = h;
     };
-    $$("[data-tstep]", f).forEach((b) => b.addEventListener("click", () => { $("#x-kg").value = ""; $("#x-tanks").value = String(Math.max(1, (Number($("#x-tanks").value) || 0) + Number(b.dataset.tstep))); sync(); }));
-    ["#x-tanks", "#x-kg"].forEach((s) => $(s).addEventListener("input", sync));
+    $$("[data-tstep]", f).forEach((b) => b.addEventListener("click", () => { $("#x-kg").value = ""; $("#x-tanks").value = String(Math.max(1, (Number($("#x-tanks").value) || 0) + Number(b.dataset.tstep))); quantityChanged(); }));
+    ["#x-tanks", "#x-kg"].forEach((s) => $(s).addEventListener("input", quantityChanged));
+    $("#x-paid").addEventListener("input", () => { paidTyped = true; $("#x-paid-note").hidden = true; });
     sync();
   }
 
@@ -747,7 +759,7 @@ function fillSettings() {
   $("#st-open").value = kgStr(s.openingStockCkg); $("#st-opencost").value = dec(s.openingStockCostCents);
   const fields = [["sellCents", "Selling price", money], ["baseBuyCents", "Normal buying", money], ["bulkBuyCents", "Bulk buying", money], ["bulkMinCkg", "Bulk from", kg], ["tankCkg", "Tank size", kg], ["lowStockCkg", "Low-stock warning", kg], ["openingStockCkg", "Opening stock", kg], ["openingStockCostCents", "Opening stock cost", money]];
   const h = L.settingsHistory || [];
-  $("#settings-history").innerHTML = h.length ? h.slice().reverse().map((x) => `<div style="padding:7px 0;border-bottom:1px solid var(--line)"><b>${esc(new Date(x.at).toLocaleString("en-GB"))}</b><br>${fields.filter(([k]) => (x.before || {})[k] !== (x.after || {})[k]).map(([k, label, fmt]) => `${label}: ${fmt((x.before || {})[k] ?? 0)} \u2192 ${fmt(x.after[k])}`).join("; ") || "Quick sizes changed"}</div>`).join("") : "No changes yet.";
+  $("#settings-history").innerHTML = h.length ? h.slice().reverse().map((x) => `<div style="padding:7px 0;border-bottom:1px solid var(--line)"><b>${esc(new Date(x.at).toLocaleString("en-GB"))}</b><br>${fields.filter(([k]) => (x.before || {})[k] !== (x.after || {})[k]).map(([k, label, fmt]) => `${label}: ${fmt((x.before || {})[k] ?? 0)} \u2192 ${fmt(x.after[k])}`).concat(String((x.before || {}).quickSizesCkg) !== String(x.after.quickSizesCkg) ? [`Quick sizes: ${(x.after.quickSizesCkg || []).map(kgStr).join(", ")} kg`] : []).join("; ") || "No change"}</div>`).join("") : "No changes yet.";
 }
 function lock(locked) {
   unlocked = !locked;

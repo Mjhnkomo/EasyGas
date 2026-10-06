@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#162027">
+<title>Easy Gas &#xb7; Back office</title>
+<link rel="icon" href="/easy-gas-logo.png">
+<style>
+  :root { --blue:#015bad; --red:#da1821; --ink:#162027; --green:#128c4a; --paper:#f4f6f9; --line:#e1e6ee; --muted:#5a6574; --amber:#b45309; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color:var(--ink); background:var(--paper); line-height:1.45; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+  header { background:#fff; border-bottom:1px solid var(--line); position: sticky; top:0; z-index:10; }
+  header .wrap { display:flex; align-items:center; justify-content:space-between; height:60px; gap:12px; }
+  header img { height:34px; width:auto; }
+  .tag { font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  nav.tabs { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; padding:10px 0; }
+  nav.tabs button { border:1px solid var(--line); background:#fff; border-radius:999px; padding:8px 4px; font:inherit; font-size:14px; font-weight:700; color:var(--ink); cursor:pointer; min-height:42px; }
+  @media (min-width:600px) { nav.tabs { display:flex; } nav.tabs button { padding:9px 18px; font-size:15px; } }
+  nav.tabs button[aria-selected=true] { background:var(--ink); color:#fff; border-color:var(--ink); }
+  h1 { font-size:1.5rem; margin:18px 0 4px; }
+  h2 { font-size:1.15rem; margin:0 0 12px; }
+  .muted { color:var(--muted); }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:14px; }
+  .grid { display:grid; gap:12px; }
+  @media (min-width:700px) { .grid.two { grid-template-columns: 1fr 1fr; } .grid.three { grid-template-columns: repeat(3,1fr); } }
+  .stat { background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; }
+  .stat .label { font-size:13px; font-weight:700; color:var(--muted); }
+  .stat .value { font-size:1.9rem; font-weight:800; letter-spacing:-.02em; margin-top:2px; }
+  .stat .sub { font-size:13px; color:var(--muted); margin-top:2px; }
+  .pos { color:var(--green); } .neg { color:var(--red); }
+  dl.rows { margin:0; } dl.rows div { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--line); } dl.rows div:last-child { border-bottom:0; }
+  dl.rows dt { color:var(--muted); } dl.rows dd { margin:0; font-weight:700; text-align:right; }
+  label { display:block; font-weight:700; font-size:14px; margin:12px 0 6px; }
+  input, select, textarea { width:100%; min-height:48px; border:1.5px solid #cfd6e1; border-radius:12px; padding:10px 12px; font:inherit; font-size:16px; background:#fff; color:var(--ink); }
+  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 4px rgb(1 91 173 / .15); }
+  input[readonly] { background:var(--paper); color:var(--muted); }
+  .btn { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 20px; border-radius:12px; border:0; font:inherit; font-weight:800; cursor:pointer; background:var(--blue); color:#fff; }
+  .btn.secondary { background:#fff; color:var(--ink); border:1.5px solid var(--line); }
+  .btn.danger { background:#fff; color:var(--red); border:1.5px solid #f2c4c6; }
+  .btn.small { min-height:38px; padding:0 12px; font-size:14px; }
+  .btn:disabled { opacity:.55; cursor:not-allowed; }
+  .row { display:grid; gap:0 12px; } @media (min-width:600px) { .row { grid-template-columns:1fr 1fr; } }
+  .preview { background:var(--paper); border-radius:12px; padding:12px 14px; margin-top:14px; font-size:15px; }
+  .badge { display:inline-block; border-radius:999px; padding:2px 10px; font-size:12px; font-weight:800; }
+  .badge.bulk { background:#eaf6ee; color:var(--green); } .badge.base { background:#eef3fa; color:var(--blue); }
+  .msg { border-radius:12px; padding:10px 14px; margin:12px 0; font-weight:600; }
+  .msg.ok { background:#eaf6ee; color:#0b5a2f; } .msg.err { background:#fdecec; color:#9b1218; } .msg.warn { background:#fff6e5; color:#7a4504; }
+  table { width:100%; border-collapse:collapse; font-size:14px; } th, td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:top; } th { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.05em; } td.num, th.num { text-align:right; font-variant-numeric: tabular-nums; }
+  .table-wrap { overflow-x:auto; }
+  .seg { display:flex; gap:6px; flex-wrap:wrap; }
+  .seg button { border:1.5px solid var(--line); background:#fff; border-radius:10px; padding:8px 12px; font:inherit; font-weight:700; cursor:pointer; min-height:40px; }
+  .seg button[aria-pressed=true] { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .lock { display:flex; align-items:center; gap:8px; font-weight:800; }
+  .center { min-height:80vh; display:grid; place-items:center; }
+  .auth { width:100%; max-width:380px; }
+  .num { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div style="display:flex;align-items:center;gap:10px"><img src="/easy-gas-logo.png" alt="Easy Gas" width="600" height="221"><span class="tag">Back office</span></div>
+    <button class="btn secondary small" id="logout" hidden>Log out</button>
+  </div>
+</header>
+
+<!-- Sign in / first-time setup -->
+<main id="auth-view" class="wrap center" hidden>
+  <div class="auth card">
+    <div id="setup-box" hidden>
+      <h2>Set up the back office</h2>
+      <p class="muted">Enter the setup code from Netlify and choose the owner password. This can only be done once.</p>
+      <label for="setup-code">Setup code</label><input id="setup-code" autocomplete="off">
+      <label for="setup-pw">Choose a password (10+ characters)</label><input id="setup-pw" type="password" autocomplete="new-password">
+      <label for="setup-pw2">Repeat password</label><input id="setup-pw2" type="password" autocomplete="new-password">
+      <div id="setup-msg"></div>
+      <button class="btn" id="setup-btn" style="width:100%;margin-top:14px">Create owner login</button>
+    </div>
+    <div id="nosetup-box" hidden>
+      <h2>Not set up yet</h2>
+      <p class="muted">The site owner needs to add the setup code in Netlify (environment variable <b>EASYGAS_SETUP_CODE</b>) and redeploy.</p>
+    </div>
+    <form id="login-box" hidden>
+      <h2>Owner log in</h2>
+      <label for="login-pw">Password</label><input id="login-pw" type="password" autocomplete="current-password">
+      <div id="login-msg"></div>
+      <button class="btn" style="width:100%;margin-top:14px">Log in</button>
+    </form>
+  </div>
+</main>
+
+<!-- App -->
+<main id="app" class="wrap" hidden>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" aria-selected="true" data-tab="overview">Profit</button>
+    <button role="tab" aria-selected="false" data-tab="add">Add</button>
+    <button role="tab" aria-selected="false" data-tab="history">History</button>
+    <button role="tab" aria-selected="false" data-tab="settings">Settings</button>
+  </nav>
+
+  <!-- PROFIT -->
+  <section data-panel="overview">
+    <div class="seg" id="period" role="group" aria-label="Period">
+      <button data-p="week" aria-pressed="false">This week</button>
+      <button data-p="month" aria-pressed="true">This month</button>
+      <button data-p="lastmonth" aria-pressed="false">Last month</button>
+      <button data-p="all" aria-pressed="false">All time</button>
+      <button data-p="custom" aria-pressed="false">Custom</button>
+    </div>
+    <div class="row" id="custom-range" hidden>
+      <div><label for="from">From</label><input type="date" id="from"></div>
+      <div><label for="to">To</label><input type="date" id="to"></div>
+    </div>
+    <p class="muted" id="period-label" style="margin:12px 0"></p>
+    <div id="warnings"></div>
+
+    <div class="grid three">
+      <div class="stat"><div class="label">Profit on gas sold</div><div class="value num" id="k-profit">&#x2014;</div><div class="sub" id="k-profit-sub"></div></div>
+      <div class="stat"><div class="label">Cash in minus cash out</div><div class="value num" id="k-cash">&#x2014;</div><div class="sub">Money received &#x2212; gas bought &#x2212; expenses</div></div>
+      <div class="stat"><div class="label">Gas in stock now</div><div class="value num" id="k-stock">&#x2014;</div><div class="sub" id="k-stock-sub"></div></div>
+    </div>
+
+    <div class="grid two" style="margin-top:12px">
+      <div class="card"><h2>Sales</h2><dl class="rows">
+        <div><dt>Gas sold</dt><dd class="num" id="s-kg"></dd></div>
+        <div><dt>Should have made (at selling price)</dt><dd class="num" id="s-expected"></dd></div>
+        <div><dt>Actually received</dt><dd class="num" id="s-received"></dd></div>
+        <div><dt>Difference</dt><dd class="num" id="s-diff"></dd></div>
+      </dl></div>
+      <div class="card"><h2>Gas bought</h2><dl class="rows">
+        <div><dt>Gas bought</dt><dd class="num" id="b-kg"></dd></div>
+        <div><dt>Paid</dt><dd class="num" id="b-paid"></dd></div>
+        <div><dt>Restocks (bulk price)</dt><dd class="num" id="b-count"></dd></div>
+        <div><dt>Saved with bulk price</dt><dd class="num pos" id="b-saved"></dd></div>
+      </dl></div>
+      <div class="card"><h2>Profit on gas sold</h2><dl class="rows">
+        <div><dt>Money received</dt><dd class="num" id="p-received"></dd></div>
+        <div><dt>Cost of the gas sold</dt><dd class="num" id="p-cogs"></dd></div>
+        <div><dt>Gross profit</dt><dd class="num" id="p-gross"></dd></div>
+        <div><dt>Expenses</dt><dd class="num" id="p-exp"></dd></div>
+        <div><dt><b>Net profit</b></dt><dd class="num" id="p-net"></dd></div>
+      </dl><p class="muted" style="font-size:13px;margin:10px 0 0">Gas sold is costed at the average price of the gas in stock, so a big bulk restock doesn't distort one week.</p></div>
+      <div class="card"><h2>Expenses</h2><dl class="rows" id="exp-list"></dl></div>
+    </div>
+  </section>
+
+  <!-- ADD FIGURES -->
+  <section data-panel="add" hidden>
+    <div class="seg" id="add-kind" role="group" aria-label="What are you adding?" style="margin-bottom:12px">
+      <button data-k="sale" aria-pressed="true">Today's sales</button>
+      <button data-k="restock" aria-pressed="false">Gas bought (restock)</button>
+      <button data-k="expense" aria-pressed="false">Expense</button>
+    </div>
+    <div id="add-msg"></div>
+
+    <form class="card" id="f-sale" data-form="sale">
+      <h2>Daily sales</h2>
+      <p class="muted">Once a day: how much gas went out, and how much money actually came in (EcoCash + cash).</p>
+      <div class="row">
+        <div><label for="sale-date">Date</label><input type="date" id="sale-date" name="date" required></div>
+        <div><label for="sale-kg">Gas sold (kg)</label><input id="sale-kg" name="kg" inputmode="decimal" placeholder="e.g. 90" required></div>
+      </div>
+      <label for="sale-received">Money actually received ($)</label><input id="sale-received" name="received" inputmode="decimal" placeholder="e.g. 171.00" required>
+      <label for="sale-note">Note (optional)</label><input id="sale-note" name="note" placeholder="e.g. gave 1 customer a discount">
+      <div class="preview" id="sale-preview">Enter the kg sold to see what should have been made.</div>
+      <button class="btn" style="margin-top:14px">Save sales</button>
+    </form>
+
+    <form class="card" id="f-restock" data-form="restock" hidden>
+      <h2>Gas bought (restock)</h2>
+      <p class="muted" id="restock-rule"></p>
+      <div class="row">
+        <div><label for="r-date">Date</label><input type="date" id="r-date" name="date" required></div>
+        <div><label for="r-tanks">Tanks filled</label><input id="r-tanks" name="tanks" inputmode="numeric" placeholder="e.g. 5"></div>
+      </div>
+      <label for="r-kg">Or exact kg bought (if tanks weren't empty)</label><input id="r-kg" name="kg" inputmode="decimal" placeholder="e.g. 230">
+      <div class="preview" id="restock-preview">Enter tanks or kg to see the price.</div>
+      <label for="r-paid">Amount actually paid ($), if different</label><input id="r-paid" name="paid" inputmode="decimal" placeholder="Leave blank to use the price above">
+      <label for="r-note">Note (optional)</label><input id="r-note" name="note" placeholder="e.g. supplier name">
+      <button class="btn" style="margin-top:14px">Save restock</button>
+    </form>
+
+    <form class="card" id="f-expense" data-form="expense" hidden>
+      <h2>Expense</h2>
+      <div class="row">
+        <div><label for="e-date">Date</label><input type="date" id="e-date" name="date" required></div>
+        <div><label for="e-cat">Category</label><select id="e-cat" name="category"></select></div>
+      </div>
+      <label for="e-amount">Amount ($)</label><input id="e-amount" name="amount" inputmode="decimal" placeholder="e.g. 12.50" required>
+      <label for="e-note">Note (optional)</label><input id="e-note" name="note" placeholder="e.g. fuel for deliveries">
+      <button class="btn" style="margin-top:14px">Save expense</button>
+    </form>
+  </section>
+
+  <!-- HISTORY -->
+  <section data-panel="history" hidden>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">All entries</h2><button class="btn secondary small" id="csv">Download CSV backup</button></div>
+      <p class="muted" style="font-size:13px">Made a mistake? Delete the entry and add it again. Each entry keeps the prices that applied on the day.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Date</th><th>Type</th><th>Details</th><th class="num">Amount</th><th></th></tr></thead>
+        <tbody id="history-body"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section data-panel="settings" hidden>
+    <div class="card">
+      <div class="lock">&#x1f512; Prices are locked</div>
+      <p class="muted">These prices are used for every new entry. Changing them doesn't change entries already saved. To change them, unlock with your password.</p>
+      <form id="f-settings">
+        <div class="row">
+          <div><label for="st-sell">Selling price per kg ($)</label><input id="st-sell" name="sell" inputmode="decimal" readonly></div>
+          <div><label for="st-tank">Tank size (kg)</label><input id="st-tank" name="tankKg" inputmode="decimal" readonly></div>
+          <div><label for="st-base">Normal buying price per kg ($)</label><input id="st-base" name="baseBuy" inputmode="decimal" readonly></div>
+          <div><label for="st-bulk">Bulk buying price per kg ($)</label><input id="st-bulk" name="bulkBuy" inputmode="decimal" readonly></div>
+          <div><label for="st-min">Bulk price applies from (kg per restock)</label><input id="st-min" name="bulkMinKg" inputmode="decimal" readonly></div>
+        </div>
+        <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">Opening stock (gas already in the tanks before you started recording)</summary>
+          <div class="row">
+            <div><label for="st-open">Opening stock (kg)</label><input id="st-open" name="openingStockKg" inputmode="decimal" readonly></div>
+            <div><label for="st-opencost">It cost per kg ($)</label><input id="st-opencost" name="openingStockCost" inputmode="decimal" readonly></div>
+          </div>
+        </details>
+        <div id="unlock-area" hidden>
+          <div class="msg warn">You're changing the prices used for all new entries.</div>
+          <label for="st-pw">Your password</label><input id="st-pw" type="password" autocomplete="current-password">
+          <label for="st-confirm">Type CHANGE to confirm</label><input id="st-confirm" autocomplete="off" placeholder="CHANGE">
+        </div>
+        <div id="settings-msg"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+          <button type="button" class="btn secondary" id="unlock">Unlock to edit</button>
+          <button class="btn" id="save-settings" hidden>Save new prices</button>
+          <button type="button" class="btn secondary" id="cancel-settings" hidden>Cancel</button>
+        </div>
+      </form>
+    </div>
+    <div class="card"><h2>Price change history</h2><div id="settings-history" class="muted">No changes yet.</div></div>
+    <form class="card" id="f-password">
+      <h2>Change password</h2>
+      <p class="muted">This signs out every other phone or computer.</p>
+      <div class="row">
+        <div><label for="pw-current">Current password</label><input id="pw-current" type="password" autocomplete="current-password"></div>
+        <div><label for="pw-next">New password (10+ characters)</label><input id="pw-next" type="password" autocomplete="new-password"></div>
+      </div>
+      <div id="pw-msg"></div>
+      <button class="btn secondary" style="margin-top:14px">Change password</button>
+    </form>
+  </section>
+  <p class="muted" style="font-size:12px;text-align:center;margin:24px 0">Easy Gas back office &#xb7; private &#x2014; please don't share this page's login.</p>
+</main>
+
+<script>
+(function () {
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const money = (c) => (c < 0 ? "-$" : "$") + (Math.abs(c) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const kgFmt = (ckg) => (ckg / 100).toLocaleString("en-US", { maximumFractionDigits: 2 }) + " kg";
+  const toDecimal = (c) => (c / 100).toFixed(2);
+  const toKg = (ckg) => String(ckg / 100);
+  const parseKg = (v) => { const s = String(v || "").trim().replace(",", "."); if (!/^\d{1,5}(\.\d{1,2})?$/.test(s)) return null; const [w, f = ""] = s.split("."); const c = +w * 100 + +(f + "00").slice(0, 2); return c > 0 ? c : null; };
+  const parseMoney = (v) => { const s = String(v || "").trim().replace(",", ".").replace(/^\$/, ""); if (!/^\d{1,7}(\.\d{1,2})?$/.test(s)) return null; const [w, f = ""] = s.split("."); return +w * 100 + +(f + "00").slice(0, 2); };
+  const costFor = (rate, ckg) => Math.floor((rate * ckg + 50) / 100);
+  const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const today = () => iso(new Date());
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const msg = (el, text, kind) => { el.innerHTML = text ? `<div class="msg ${kind || "err"}" role="${kind === "ok" ? "status" : "alert"}">${esc(text)}</div>` : ""; };
+
+  let state = null;
+  let period = "month";
+
+  async function api(action, data) {
+    let res;
+    try {
+      res = await fetch("/admin-api", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json", "x-easygas": "1" }, body: JSON.stringify({ action, ...(data || {}) }) });
+    } catch (e) {
+      return { ok: false, status: 0, data: { error: "No connection. Check your internet and try again; nothing was saved." } };
+    }
+    let body = {};
+    try { body = await res.json(); } catch (e) { body = { error: "The server didn't respond properly. Try again." }; }
+    if (res.status === 401 && body.signedOut) showAuth();
+    return { ok: res.ok, status: res.status, data: body };
+  }
+
+  // ----- Auth -----
+  async function boot() {
+    const r = await api("status");
+    if (!r.ok) { showAuth(r.data.error); return; }
+    if (r.data.signedIn) return showApp();
+    showAuth(null, r.data);
+  }
+  function showAuth(error, status) {
+    $("#app").hidden = true; $("#logout").hidden = true; $("#auth-view").hidden = false;
+    const s = status || { setUp: true };
+    $("#setup-box").hidden = s.setUp || !s.setupAvailable;
+    $("#nosetup-box").hidden = s.setUp || s.setupAvailable;
+    $("#login-box").hidden = !s.setUp;
+    if (error) msg($("#login-msg"), error);
+  }
+  $("#setup-btn").addEventListener("click", async () => {
+    const pw = $("#setup-pw").value;
+    if (pw.length < 10) return msg($("#setup-msg"), "Choose a password of at least 10 characters.");
+    if (pw !== $("#setup-pw2").value) return msg($("#setup-msg"), "The passwords don't match.");
+    $("#setup-btn").disabled = true;
+    const r = await api("setup", { setupCode: $("#setup-code").value.trim(), password: pw });
+    $("#setup-btn").disabled = false;
+    if (!r.ok) return msg($("#setup-msg"), r.data.error);
+    showApp();
+  });
+  $("#login-box").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = $("#login-box button"); btn.disabled = true;
+    const r = await api("login", { password: $("#login-pw").value });
+    btn.disabled = false;
+    if (!r.ok) return msg($("#login-msg"), r.data.error);
+    $("#login-pw").value = "";
+    showApp();
+  });
+  $("#logout").addEventListener("click", async () => { await api("logout"); location.reload(); });
+
+  async function showApp() {
+    $("#auth-view").hidden = true; $("#app").hidden = false; $("#logout").hidden = false;
+    for (const id of ["sale-date", "r-date", "e-date"]) if (!$("#" + id).value) $("#" + id).value = today();
+    await reload();
+  }
+
+  // ----- Data -----
+  function range() {
+    const now = new Date();
+    if (period === "week") { const d = new Date(now); const day = (d.getDay() + 6) % 7; d.setDate(d.getDate() - day); return [iso(d), today()]; }
+    if (period === "month") return [iso(new Date(now.getFullYear(), now.getMonth(), 1)), today()];
+    if (period === "lastmonth") return [iso(new Date(now.getFullYear(), now.getMonth() - 1, 1)), iso(new Date(now.getFullYear(), now.getMonth(), 0))];
+    if (period === "custom") return [$("#from").value || null, $("#to").value || null];
+    return [null, null];
+  }
+  async function reload() {
+    const [from, to] = range();
+    const r = await api("load", { from, to });
+    if (!r.ok) return msg($("#warnings"), r.data.error);
+    state = r.data;
+    render();
+  }
+  async function refreshSummary() {
+    const [from, to] = range();
+    const r = await api("summary", { from, to });
+    if (r.ok) { state.summary = r.data.summary; renderSummary(); }
+  }
+
+  function signed(el, cents) { el.textContent = money(cents); el.classList.toggle("pos", cents > 0); el.classList.toggle("neg", cents < 0); }
+
+  function renderSummary() {
+    const s = state.summary;
+    const [from, to] = range();
+    $("#period-label").textContent = from || to ? `Showing ${from || "the start"} to ${to || "today"}` : "Showing all time";
+    signed($("#k-profit"), s.profitOnGasSold.netProfitCents);
+    $("#k-profit-sub").textContent = s.profitOnGasSold.profitPerKgCents !== null ? `${money(s.profitOnGasSold.profitPerKgCents)} per kg sold, after expenses` : "No sales in this period yet";
+    signed($("#k-cash"), s.cash.netCents);
+    $("#k-stock").textContent = kgFmt(s.stockNow.kgCkg);
+    $("#k-stock-sub").textContent = s.stockNow.avgCostCents !== null ? `About ${s.stockNow.tanks} tanks, worth ${money(s.stockNow.valueCents)} (avg ${money(s.stockNow.avgCostCents)}/kg)` : "Record a restock to track stock";
+    $("#s-kg").textContent = kgFmt(s.sales.kgCkg);
+    $("#s-expected").textContent = money(s.sales.expectedCents);
+    $("#s-received").textContent = money(s.sales.receivedCents);
+    signed($("#s-diff"), s.sales.differenceCents);
+    $("#b-kg").textContent = kgFmt(s.gasBought.kgCkg);
+    $("#b-paid").textContent = money(s.gasBought.paidCents);
+    $("#b-count").textContent = `${s.gasBought.restocks} (${s.gasBought.bulkRestocks} bulk)`;
+    $("#b-saved").textContent = money(s.gasBought.bulkSavingsCents);
+    $("#p-received").textContent = money(s.sales.receivedCents);
+    $("#p-cogs").textContent = "-" + money(s.profitOnGasSold.costOfGasSoldCents);
+    signed($("#p-gross"), s.profitOnGasSold.grossProfitCents);
+    $("#p-exp").textContent = "-" + money(s.expenses.totalCents);
+    signed($("#p-net"), s.profitOnGasSold.netProfitCents);
+    const cats = Object.entries(s.expenses.byCategory);
+    $("#exp-list").innerHTML = cats.length ? cats.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd class="num">${money(v)}</dd></div>`).join("") + `<div><dt><b>Total</b></dt><dd class="num">${money(s.expenses.totalCents)}</dd></div>` : `<p class="muted" style="margin:0">No expenses in this period.</p>`;
+    const w = [];
+    if (s.stockNow.shortfallCkg > 0) w.push(`More gas has been recorded as sold than was recorded as bought (${kgFmt(s.stockNow.shortfallCkg)} short). Add the missing restock, or set your opening stock in Settings. Until then the extra kg is costed at the normal buying price.`);
+    $("#warnings").innerHTML = w.map((t) => `<div class="msg warn">${t}</div>`).join("");
+  }
+
+  function render() {
+    renderSummary();
+    const st = state.settings;
+    $("#e-cat").innerHTML = state.categories.map((c) => `<option>${esc(c)}</option>`).join("");
+    $("#restock-rule").textContent = `${money(st.baseBuyCents)}/kg normally, ${money(st.bulkBuyCents)}/kg when you buy ${kgFmt(st.bulkMinCkg)} or more in one restock (${st.bulkMinCkg / st.tankCkg} tanks of ${kgFmt(st.tankCkg)}).`;
+    fillSettings();
+    renderHistory();
+    updateSalePreview(); updateRestockPreview();
+  }
+
+  // ----- Tabs -----
+  $$("[data-tab]").forEach((b) => b.addEventListener("click", () => {
+    $$("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+    $$("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== b.dataset.tab));
+    if (b.dataset.tab === "overview") refreshSummary();
+  }));
+  $$("#period [data-p]").forEach((b) => b.addEventListener("click", () => {
+    period = b.dataset.p;
+    $$("#period [data-p]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    $("#custom-range").hidden = period !== "custom";
+    refreshSummary();
+  }));
+  ["#from", "#to"].forEach((s) => $(s).addEventListener("change", refreshSummary));
+  $$("#add-kind [data-k]").forEach((b) => b.addEventListener("click", () => {
+    $$("#add-kind [data-k]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    $$("[data-form]").forEach((f) => (f.hidden = f.dataset.form !== b.dataset.k));
+    msg($("#add-msg"), "");
+  }));
+
+  // ----- Live previews -----
+  function updateSalePreview() {
+    if (!state) return;
+    const ckg = parseKg($("#sale-kg").value), rec = parseMoney($("#sale-received").value), sell = state.settings.sellCents;
+    if (!ckg) { $("#sale-preview").textContent = "Enter the kg sold to see what should have been made."; return; }
+    const exp = costFor(sell, ckg);
+    let html = `Should have made: <b>${money(exp)}</b> (${kgFmt(ckg)} &#xd7; ${money(sell)}/kg)`;
+    if (rec !== null) { const d = rec - exp; html += `<br>Received: <b>${money(rec)}</b> &#xb7; difference <b class="${d < 0 ? "neg" : d > 0 ? "pos" : ""}">${money(d)}</b>`; }
+    $("#sale-preview").innerHTML = html;
+  }
+  function updateRestockPreview() {
+    if (!state) return;
+    const st = state.settings;
+    let ckg = parseKg($("#r-kg").value);
+    const tanks = Number($("#r-tanks").value);
+    if (!ckg && Number.isInteger(tanks) && tanks > 0) ckg = tanks * st.tankCkg;
+    if (!ckg) { $("#restock-preview").textContent = "Enter tanks or kg to see the price."; return; }
+    const bulk = ckg >= st.bulkMinCkg, rate = bulk ? st.bulkBuyCents : st.baseBuyCents, cost = costFor(rate, ckg);
+    let html = `${kgFmt(ckg)} at <b>${money(rate)}/kg</b> <span class="badge ${bulk ? "bulk" : "base"}">${bulk ? "Bulk price" : "Normal price"}</span><br>Cost: <b>${money(cost)}</b>`;
+    if (bulk) html += ` &#xb7; you save <b class="pos">${money(costFor(st.baseBuyCents, ckg) - cost)}</b>`;
+    else html += `<br><span class="muted">Buy ${kgFmt(st.bulkMinCkg - ckg)} more in this restock to get ${money(st.bulkBuyCents)}/kg.</span>`;
+    $("#restock-preview").innerHTML = html;
+  }
+  ["#sale-kg", "#sale-received"].forEach((s) => $(s).addEventListener("input", updateSalePreview));
+  ["#r-kg", "#r-tanks"].forEach((s) => $(s).addEventListener("input", updateRestockPreview));
+
+  // ----- Saving entries -----
+  async function submitEntry(form, action, extra) {
+    const btn = $("button", form);
+    if (btn.disabled) return;
+    const data = Object.fromEntries(new FormData(form).entries());
+    btn.disabled = true;
+    let r = await api(action, { ...data, ...(extra || {}) });
+    if (!r.ok && r.data.duplicateDate && confirm("Sales for this date are already recorded. Add a second entry for the same day?")) r = await api(action, { ...data, allowSecond: true });
+    btn.disabled = false;
+    if (!r.ok) return msg($("#add-msg"), r.data.error);
+    msg($("#add-msg"), "Saved.", "ok");
+    $$("input:not([type=date])", form).forEach((i) => (i.value = ""));
+    await reload();
+  }
+  $("#f-sale").addEventListener("submit", (e) => { e.preventDefault(); submitEntry(e.target, "addSale"); });
+  $("#f-restock").addEventListener("submit", (e) => { e.preventDefault(); submitEntry(e.target, "addRestock"); });
+  $("#f-expense").addEventListener("submit", (e) => { e.preventDefault(); submitEntry(e.target, "addExpense"); });
+
+  // ----- History -----
+  function allEntries() {
+    return [
+      ...state.sales.map((x) => ({ kind: "sale", date: x.date, id: x.id, type: "Sales", details: `${kgFmt(x.ckg)} sold &#xb7; should have made ${money(x.expectedCents)}${x.note ? " &#xb7; " + esc(x.note) : ""}`, amount: x.receivedCents, csv: [x.date, "Sales", x.ckg / 100, toDecimal(x.sellCents), toDecimal(x.expectedCents), toDecimal(x.receivedCents), "", x.note] })),
+      ...state.restocks.map((x) => ({ kind: "restock", date: x.date, id: x.id, type: "Restock", details: `${kgFmt(x.ckg)} at ${money(x.rateCents)}/kg <span class="badge ${x.bulk ? "bulk" : "base"}">${x.bulk ? "bulk" : "normal"}</span>${x.paidCents !== x.calcCents ? " &#xb7; calculated " + money(x.calcCents) : ""}${x.note ? " &#xb7; " + esc(x.note) : ""}`, amount: -x.paidCents, csv: [x.date, "Restock", x.ckg / 100, toDecimal(x.rateCents), toDecimal(x.calcCents), "", toDecimal(x.paidCents), x.note] })),
+      ...state.expenses.map((x) => ({ kind: "expense", date: x.date, id: x.id, type: "Expense", details: `${esc(x.category)}${x.note ? " &#xb7; " + esc(x.note) : ""}`, amount: -x.amountCents, csv: [x.date, "Expense: " + x.category, "", "", "", "", toDecimal(x.amountCents), x.note] })),
+    ].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  }
+  function renderHistory() {
+    const rows = allEntries();
+    $("#history-body").innerHTML = rows.length ? rows.map((e) => `<tr><td>${e.date}</td><td>${e.type}</td><td>${e.details}</td><td class="num ${e.amount < 0 ? "neg" : "pos"}">${money(e.amount)}</td><td><button class="btn danger small" data-del="${e.kind}:${e.id}">Delete</button></td></tr>`).join("") : `<tr><td colspan="5" class="muted">Nothing recorded yet.</td></tr>`;
+  }
+  $("#history-body").addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-del]");
+    if (!b || !confirm("Delete this entry? This can't be undone.")) return;
+    const [kind, id] = b.dataset.del.split(":");
+    b.disabled = true;
+    const r = await api("delete", { kind, id });
+    if (!r.ok) { b.disabled = false; alert(r.data.error); return; }
+    await reload();
+  });
+  $("#csv").addEventListener("click", () => {
+    const cell = (v) => { let s = v == null ? "" : String(v); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+    const head = ["Date", "Type", "Kg", "Price per kg", "Expected / calculated", "Received", "Paid / spent", "Note"];
+    const lines = [head, ...allEntries().reverse().map((e) => e.csv)].map((r) => r.map(cell).join(","));
+    const blob = new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `easy-gas-backoffice-${today()}.csv`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  // ----- Settings (locked) -----
+  const settingInputs = ["#st-sell", "#st-tank", "#st-base", "#st-bulk", "#st-min", "#st-open", "#st-opencost"];
+  function fillSettings() {
+    const s = state.settings;
+    $("#st-sell").value = toDecimal(s.sellCents); $("#st-tank").value = toKg(s.tankCkg);
+    $("#st-base").value = toDecimal(s.baseBuyCents); $("#st-bulk").value = toDecimal(s.bulkBuyCents);
+    $("#st-min").value = toKg(s.bulkMinCkg); $("#st-open").value = toKg(s.openingStockCkg); $("#st-opencost").value = toDecimal(s.openingStockCostCents);
+    const h = state.settingsHistory;
+    const describe = (b, a) => [["sellCents", "Selling price", money], ["baseBuyCents", "Normal buying price", money], ["bulkBuyCents", "Bulk buying price", money], ["bulkMinCkg", "Bulk from", kgFmt], ["tankCkg", "Tank size", kgFmt], ["openingStockCkg", "Opening stock", kgFmt], ["openingStockCostCents", "Opening stock cost", money]].filter(([k]) => b[k] !== a[k]).map(([k, label, f]) => `${label}: ${f(b[k])} &#x2192; ${f(a[k])}`).join("; ");
+    $("#settings-history").innerHTML = h.length ? h.slice().reverse().map((x) => `<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b>${new Date(x.at).toLocaleString()}</b><br>${describe(x.before, x.after) || "No change"}</div>`).join("") : "No changes yet.";
+  }
+  function lock(locked) {
+    settingInputs.forEach((s) => ($(s).readOnly = locked));
+    $("#unlock-area").hidden = locked; $("#save-settings").hidden = locked; $("#cancel-settings").hidden = locked; $("#unlock").hidden = !locked;
+    if (locked) { $("#st-pw").value = ""; $("#st-confirm").value = ""; fillSettings(); } else $("#st-sell").focus();
+  }
+  $("#unlock").addEventListener("click", () => lock(false));
+  $("#cancel-settings").addEventListener("click", () => { lock(true); msg($("#settings-msg"), ""); });
+  $("#f-settings").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if ($("#unlock-area").hidden) return;
+    const settings = Object.fromEntries(new FormData(e.target).entries());
+    const btn = $("#save-settings"); btn.disabled = true;
+    const r = await api("updateSettings", { settings, password: $("#st-pw").value, confirm: $("#st-confirm").value.trim().toUpperCase() });
+    btn.disabled = false;
+    if (!r.ok) return msg($("#settings-msg"), r.data.error);
+    await reload();
+    lock(true);
+    msg($("#settings-msg"), "New prices saved. They apply to new entries from now on.", "ok");
+  });
+  $("#f-password").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const r = await api("changePassword", { current: $("#pw-current").value, next: $("#pw-next").value });
+    if (!r.ok) return msg($("#pw-msg"), r.data.error);
+    $("#pw-current").value = ""; $("#pw-next").value = "";
+    msg($("#pw-msg"), "Password changed. Other devices have been signed out.", "ok");
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>
